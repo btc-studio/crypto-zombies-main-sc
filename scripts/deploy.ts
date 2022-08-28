@@ -1,17 +1,22 @@
-import { ethers } from "hardhat";
+import { ethers, hardhatArguments } from 'hardhat';
+import * as Config from "./config";
 
 async function main() {
-  const ZombieFactory = await ethers.getContractFactory("ZombieFactory");
-  const zombieFactory = await ZombieFactory.deploy();
+    await Config.initConfig();
+    const network = hardhatArguments.network ? hardhatArguments.network : "dev";
+    const [deployer] = await ethers.getSigners();
+    console.log("deploy from address: ", deployer.address);
 
-  await zombieFactory.deployed();
-
-  console.log(`ZombieFactory deployed to ${zombieFactory.address}`);
+    const ZombieFactory = await ethers.getContractFactory("ZombieFactory");
+    const zombieFactory = await ZombieFactory.deploy();
+    console.log("ZombieFactory address: ", zombieFactory.address);
+    Config.setConfig(network + '.btcs', zombieFactory.address);
+    await Config.updateConfig();
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+main()
+    .then(() => process.exit(0))
+    .catch((err) => {
+        console.error(err);
+        process.exit(1);
+    });
