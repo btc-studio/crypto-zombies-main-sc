@@ -31,10 +31,15 @@ module.exports = {
       saveDeployments: true
     },
     bsctest: {
-      url: "https://data-seed-prebsc-2-s2.binance.org:8545",
+      url: "https://data-seed-prebsc-1-s1.binance.org:8545",
+      chainId: 97,
       accounts: [process.env.PRIV_KEY],
-      gasPrice: 10000000000,
-      blockGasLimit: 1000000
+      gasPrice: 20000000000,
+      //blockGasLimit: 1000000
+    },
+    rinkeby: {
+      url: "https://eth-rinkeby.alchemyapi.io/v2/Lur41XBqJaVgjDGfXmSvYwzucY1r7ie5",
+      accounts: [process.env.PRIV_KEY]
     },
     solanartest: {
       url: "https://api.testnet.solana.com",
