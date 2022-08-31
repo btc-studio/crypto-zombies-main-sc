@@ -1,6 +1,9 @@
 {
   "dev": {},
   "bsctest": {
+    "btcs": "0x9cA2d72cA196e1Cca8F6068F50822eB2d7066B82"
+  },
+  "rinkeby": {
     "btcs": "0x41De94ecB62A30833a28F74bA31299f62376C789"
   },
   "main": {}
