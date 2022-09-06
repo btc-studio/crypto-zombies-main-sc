@@ -9,7 +9,6 @@ contract ZombieAttack is ZombieHelper {
     using SafeMath32 for uint32;
     using SafeMath16 for uint16;
 
-    uint randNonce = 0;
     uint attackVictoryProbability = 70;
 
     function randMod(uint _modulus) internal returns (uint) {

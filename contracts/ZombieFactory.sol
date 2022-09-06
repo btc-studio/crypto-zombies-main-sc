@@ -16,6 +16,7 @@ contract ZombieFactory is Ownable {
     uint dnaDigits = 16;
     uint dnaModulus = 10**dnaDigits;
     uint cooldownTime = 1 days;
+    uint randNonce = 0;
 
     struct Zombie {
         string name;
@@ -43,15 +44,14 @@ contract ZombieFactory is Ownable {
 
     function _generateRandomDna(string memory _str)
         private
-        view
         returns (uint)
     {
-        uint rand = uint(keccak256(abi.encodePacked(_str)));
+        randNonce = randNonce.add(1);
+        uint rand = uint(keccak256(abi.encodePacked(block.timestamp, msg.sender, randNonce, _str)));
         return rand % dnaModulus;
     }
 
     function createRandomZombie(string memory _name) public {
-        //require(ownerZombieCount[msg.sender] == 0);
         uint randDna = _generateRandomDna(_name);
         randDna = randDna - (randDna % 100);
         _createZombie(_name, randDna);
