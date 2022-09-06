@@ -7,10 +7,10 @@ async function main() {
     const [deployer] = await ethers.getSigners();
     console.log("deploy from address: ", deployer.address);
 
-    const ZombieFactory = await ethers.getContractFactory("ZombieFactory");
-    const zombieFactory = await ZombieFactory.deploy();
-    console.log("ZombieFactory address: ", zombieFactory.address);
-    Config.setConfig(network + '.btcs', zombieFactory.address);
+    const ZombieHelper = await ethers.getContractFactory("ZombieHelper");
+    const zombieHelper = await ZombieHelper.deploy();
+    console.log("ZombieHepler address: ", zombieHelper.address);
+    Config.setConfig(network + '.btcs', zombieHelper.address);
     await Config.updateConfig();
 }
 
