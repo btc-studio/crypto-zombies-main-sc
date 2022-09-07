@@ -4,9 +4,10 @@ pragma solidity ^0.8.16;
 import "./ZombieFactory.sol";
 
 abstract contract KittyInterface {
-    function getKitty(uint256 _id) virtual
+    function getKitty(uint256 _id)
         external
         view
+        virtual
         returns (
             bool isGestating,
             bool isReady,
@@ -23,6 +24,10 @@ abstract contract KittyInterface {
 
 contract ZombieFeeding is ZombieFactory {
     KittyInterface kittyContract;
+
+    using SafeMath for uint256;
+    using SafeMath32 for uint32;
+    using SafeMath16 for uint16;
 
     modifier onlyOwnerOf(uint _zombieId) {
         require(msg.sender == zombieToOwner[_zombieId]);
@@ -41,6 +46,14 @@ contract ZombieFeeding is ZombieFactory {
         return (_zombie.readyTime <= block.timestamp);
     }
 
+    function _isCanBreed(Zombie storage _zombie) internal view returns (bool) {
+        return (_zombie.level >= LVL_CAN_BREED && _zombie.breeds_points < MAX_BREEDING_POINTS);
+    }
+
+    function _stringNotEmptyOrNull(string memory input) internal pure returns (bool) {
+        return bytes(input).length > 0; 
+    }
+
     function feedAndMultiply(
         uint _zombieId,
         uint _targetDna,
@@ -50,7 +63,10 @@ contract ZombieFeeding is ZombieFactory {
         require(_isReady(myZombie));
         _targetDna = _targetDna % dnaModulus;
         uint newDna = (myZombie.dna + _targetDna) / 2;
-        if (keccak256(abi.encodePacked(_species)) == keccak256(abi.encodePacked("kitty"))) {
+        if (
+            keccak256(abi.encodePacked(_species)) ==
+            keccak256(abi.encodePacked("kitty"))
+        ) {
             newDna = newDna - (newDna % 100) + 99;
         }
         _createZombie("NoName", newDna);
@@ -62,4 +78,56 @@ contract ZombieFeeding is ZombieFactory {
         (, , , , , , , , , kittyDna) = kittyContract.getKitty(_kittyId);
         feedAndMultiply(_zombieId, kittyDna, "kitty");
     }
+
+    function _generateDna(uint dna1, uint dna2, string memory _name) private returns (uint) {
+        randNonce = randNonce.add(1);
+        uint rand = uint(
+            keccak256(
+                abi.encodePacked(block.timestamp, dna1, dna2, _name)
+            )
+        );
+        return rand % dnaModulus;
+    }
+
+    function breedZombie(uint _fatherId, uint _motherId, string memory _name)
+        public
+        onlyOwnerOf(_fatherId)
+        onlyOwnerOf(_motherId)
+    {
+        Zombie storage father = zombies[_fatherId];
+        Zombie storage mother = zombies[_motherId];
+
+        // Kiểm tra điều kiện
+        require(_isCanBreed(father));
+        require(_isCanBreed(mother));
+        require(_stringNotEmptyOrNull(_name));
+        require(father.sex != mother.sex);
+
+        // Add số lượt sinh sản
+        father.breeds_points = father.breeds_points.add(1);
+        mother.breeds_points = mother.breeds_points.add(1);
+        // Tinh toán DNA Zombie con từ DNA của bố mẹ
+        uint newKittyDna = _generateDna(father.dna, mother.dna, _name);
+        _createZombie(_name, newKittyDna);
+    }
+
+    /// For testing
+    /// -------------------------------------------------
+    function setLevelZombie(uint _zombieId, uint32 level)
+        public
+        onlyOwnerOf(_zombieId)
+    {
+        Zombie storage zombie = zombies[_zombieId];
+        zombie.level = level;
+    }
+
+    // For testing
+    function setSexZombie(uint _zombieId, Sex sex)
+        public
+        onlyOwnerOf(_zombieId)
+    {
+        Zombie storage zombie = zombies[_zombieId];
+        zombie.sex = sex;
+    }
+    /// -------------------------------------------------
 }
