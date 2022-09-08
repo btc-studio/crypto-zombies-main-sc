@@ -5,43 +5,14 @@ pragma solidity ^0.8.16;
 import "hardhat/console.sol";
 import "./Ownable.sol";
 import "./SafeMath.sol";
+import "./ZombieBase.sol";
 
-uint8 constant MAX_BREEDING_POINTS = 8;
-uint8 constant LVL_CAN_BREED = 10;
-
-contract ZombieFactory is Ownable {
+contract ZombieFactory is ZombieBase {
     using SafeMath for uint256;
     using SafeMath32 for uint32;
     using SafeMath16 for uint16;
 
     event NewZombie(address sender, uint zombieId, string name, uint dna);
-
-    uint dnaDigits = 16;
-    uint dnaModulus = 10**dnaDigits;
-    uint cooldownTime = 1 days;
-    uint randNonce = 0;
-
-    enum Sex {
-        Male,
-        Female
-    }
-
-    struct Zombie {
-        uint id;
-        string name;
-        uint dna;
-        uint32 level;
-        uint32 readyTime;
-        uint16 winCount;
-        uint16 lossCount;
-        uint16 breeds_points;
-        Sex sex;
-    }
-
-    Zombie[] public zombies;
-
-    mapping(uint => address) public zombieToOwner;
-    mapping(address => uint) ownerZombieCount;
 
     function _createZombie(string memory _name, uint _dna) internal {
         Sex sex = randomSex();
@@ -56,7 +27,10 @@ contract ZombieFactory is Ownable {
                 0,
                 0,
                 0,
-                sex
+                sex,
+                uint16(randomAttack()),
+                ATTACK_COUNT_DEFAULT,
+                0
             )
         );
         zombieToOwner[id] = msg.sender;
@@ -72,11 +46,6 @@ contract ZombieFactory is Ownable {
             )
         );
         return rand % dnaModulus;
-    }
-
-    function randomSex() private view returns (Sex) {
-        uint rand = uint(keccak256(abi.encodePacked(block.timestamp)));
-        return Sex(rand % 2);
     }
 
     function createRandomZombie(string memory _name) public {
