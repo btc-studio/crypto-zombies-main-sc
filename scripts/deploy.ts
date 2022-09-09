@@ -7,9 +7,9 @@ async function main() {
     const [deployer] = await ethers.getSigners();
     console.log("deploy from address: ", deployer.address);
 
-    const ZombieHelper = await ethers.getContractFactory("ZombieHelper");
+    const ZombieHelper = await ethers.getContractFactory("ZombieAttack");
     const zombieHelper = await ZombieHelper.deploy();
-    console.log("ZombieHepler address: ", zombieHelper.address);
+    console.log("Zombie address: ", zombieHelper.address);
     Config.setConfig(network + '.btcs', zombieHelper.address);
     await Config.updateConfig();
 }

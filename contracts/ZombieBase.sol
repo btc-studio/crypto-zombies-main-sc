@@ -2,6 +2,7 @@
 pragma solidity ^0.8.16;
 import "./Ownable.sol";
 import "./SafeMath.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 uint8 constant MAX_BREEDING_POINTS = 8;
 uint8 constant LVL_CAN_BREED = 10;
@@ -18,6 +19,7 @@ contract ZombieBase is Ownable {
     uint dnaDigits = 16;
     uint dnaModulus = 10**dnaDigits;
     uint cooldownTime = 1 days;
+    ERC20 token;
 
     struct Zombie {
         uint id;
@@ -29,7 +31,7 @@ contract ZombieBase is Ownable {
         uint16 lossCount;
         uint16 breeds_points;
         Sex sex;
-        uint16 attack;
+        uint32 attack;
         uint16 attack_count;
         uint exp;
     }
@@ -129,5 +131,36 @@ contract ZombieBase is Ownable {
         for (uint i = 0; i < zombies.length; i++) {
             zombies[i].attack_count = ATTACK_COUNT_DEFAULT;
         }
+    }
+
+    // _token = MyToken's contract address
+    function setTokenContract(address _token) external onlyOwner  {
+        token = ERC20(_token);
+    }
+
+    // Modifier to check _token allowance
+    modifier checkAllowance(uint amount) {
+        require(token.allowance(msg.sender, address(this)) >= amount, "Error");
+        _;
+    }
+
+    function getName() public view returns (string memory){
+        return token.name();
+    }
+
+    function getTotalSupply() public view returns (uint256){
+        return token.totalSupply();
+    }
+    
+    function getBalanceOf(address _owner) public view returns (uint256){
+        return token.balanceOf(_owner);
+    }
+    
+     function getBalance() public view returns (uint256){
+        return token.balanceOf(address(this));
+    }
+    
+    function setTransfer(address _to, uint256 _value) public {
+        token.transfer(_to,_value);
     }
 }

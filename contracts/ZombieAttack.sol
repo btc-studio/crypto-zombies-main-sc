@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.16;
 
+import "hardhat/console.sol";
 import "./ZombieHelper.sol";
 import "./SafeMath.sol";
 
@@ -39,70 +40,63 @@ contract ZombieAttack is ZombieHelper {
         require(_isCanAttack(_targetId));
 
         // Kiểm tra xem Zombie nào chiến thắng
-        uint16 my_zombie_battle_times = ATTACK_COUNT_DEFAULT -
+        uint16 myZombieBattleTimes = ATTACK_COUNT_DEFAULT -
             myZombie.attack_count;
-        uint16 enemy_zombie_battle_times = ATTACK_COUNT_DEFAULT -
+        uint16 enemyZombieBattleTimes = ATTACK_COUNT_DEFAULT -
             enemyZombie.attack_count;
-        myZombie.attack = myZombie.attack.sub(
-            myZombie.attack.mul(5).div(100).mul(my_zombie_battle_times)
+        uint32 myZombieAtkCur = myZombie.attack.sub(
+            myZombie.attack.mul(5).div(100).mul(myZombieBattleTimes)
         );
-        enemyZombie.attack = enemyZombie.attack.sub(
-            enemyZombie.attack.mul(5).div(100).mul(enemy_zombie_battle_times)
+        uint32 enemyZombieAtkSur = enemyZombie.attack.sub(
+            enemyZombie.attack.mul(5).div(100).mul(enemyZombieBattleTimes)
         );
         uint winnerZombieId = _targetId;
-        if (myZombie.attack > enemyZombie.attack) {
+        if (myZombieAtkCur > enemyZombieAtkSur) {
             winnerZombieId = _zombieId;
-        } else if (myZombie.attack == enemyZombie.attack) {
-            if (my_zombie_battle_times >= enemy_zombie_battle_times) {
+        } else if (myZombieAtkCur == enemyZombieAtkSur) {
+            if (myZombieBattleTimes >= enemyZombieBattleTimes) {
                 winnerZombieId = _zombieId;
             }
         }
 
         // Tính toán số exp nhận được
-        uint winner_level = 1;
+        uint winnerLevel = 1;
         if (winnerZombieId == _targetId) {
-            winner_level = enemyZombie.level;
+            winnerLevel = enemyZombie.level;
         } else {
-            winner_level = myZombie.level;
+            winnerLevel = myZombie.level;
         }
-        uint exp = calculate_exp(winner_level);
+        uint exp = calculateExp(winnerLevel);
 
         // Tăng điểm kinh nghiệm cho Zombie
         // Exp Zombie thua sẽ = 30% Zombie thắng
         if (winnerZombieId == _targetId) {
-            enemyZombie.exp = enemyZombie.exp.add(exp);
-            myZombie.exp = myZombie.exp.add(exp.mul(30).div(100));
-            enemyZombie.winCount = enemyZombie.winCount.add(1);
-            myZombie.lossCount = myZombie.lossCount.add(1);
-            // TODO thưởng BTCS Token
+            updateZombie(enemyZombie, myZombie, exp);
         } else {
-            myZombie.exp = myZombie.exp.add(exp);
-            enemyZombie.exp = enemyZombie.exp.add(exp.mul(30).div(100));
-            myZombie.winCount = myZombie.winCount.add(1);
-            enemyZombie.lossCount = enemyZombie.lossCount.add(1);
-            // TODO thưởng BTCS Token
+            updateZombie(myZombie, enemyZombie, exp);
         }
 
-        // Giảm lượt tấn công
-        myZombie.attack_count = myZombie.attack_count.sub(1);
-        enemyZombie.attack_count = enemyZombie.attack_count.sub(1);
+        // Pending Thưởng BTCS Token
+        //setTransfer(zombieToOwner[winnerZombieId], AMOUNT_REWARD * 10**uint256(18));
 
         // Kiểm tra nếu Zombie đủ exp sẽ UpLevel + Attack
         internalLevelUp(_zombieId);
         internalLevelUp(_targetId);
 
+        console.log("WinnerId %s, myZombie ", winnerZombieId);
+
         emit Battle(winnerZombieId, AMOUNT_REWARD, exp);
     }
 
-    function calculate_exp(uint level) private pure returns (uint) {
-        uint exp_cal = BASE_EXP;
+    function calculateExp(uint level) private pure returns (uint) {
+        uint expCal = BASE_EXP;
         for (uint i = 2; i <= level; i++) {
-            exp_cal = exp_cal.mul(105).div(100);
+            expCal = expCal.mul(105).div(100);
         }
-        return exp_cal;
+        return expCal;
     }
 
-    // Lỗi update 
+    // Update các thông tin của Zombie: exp. a
     function updateZombie(
         Zombie storage winZombie,
         Zombie storage lossZombie,
