@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.16;
 
+import "hardhat/console.sol";
 import "./ZombieHelper.sol";
 import "./SafeMath.sol";
 
@@ -9,11 +10,23 @@ contract ZombieAttack is ZombieHelper {
     using SafeMath32 for uint32;
     using SafeMath16 for uint16;
 
-    uint attackVictoryProbability = 70;
+    event Battle(uint _zombieId, uint amout, uint exp);
 
-    function randMod(uint _modulus) internal returns (uint) {
-        randNonce = randNonce.add(1);
-        return uint(keccak256(abi.encodePacked(block.timestamp, msg.sender, randNonce))) % _modulus;
+    function findBattle(uint _zombieId)
+        external
+        onlyOwnerOf(_zombieId)
+        returns (Zombie memory)
+    {
+        // Kiểm tra Zombie còn lượt tấn công hay không?
+        require(_isCanAttack(_zombieId));
+
+        // Kiểm tra nếu chỉ có 1 ví sở hữu Zombie thì sẽ trả về lỗi
+        require(_isNotOnlyOwner());
+
+        // Tìm kiếm Zombie
+        int _targetId = randomZombie(_zombieId);
+        require(_targetId >= 0);
+        return zombies[uint(_targetId)];
     }
 
     function attack(uint _zombieId, uint _targetId)
@@ -22,16 +35,78 @@ contract ZombieAttack is ZombieHelper {
     {
         Zombie storage myZombie = zombies[_zombieId];
         Zombie storage enemyZombie = zombies[_targetId];
-        uint rand = randMod(100);
-        if (rand <= attackVictoryProbability) {
-            myZombie.winCount = myZombie.winCount.add(1);
-            myZombie.level = myZombie.level.add(1);
-            enemyZombie.lossCount = enemyZombie.lossCount.add(1);
-            feedAndMultiply(_zombieId, enemyZombie.dna, "zombie");
-        } else {
-            myZombie.lossCount = myZombie.lossCount.add(1);
-            enemyZombie.winCount = enemyZombie.winCount.add(1);
-            _triggerCooldown(myZombie);
+        // Kiểm tra Zombie còn lượt tấn công hay không?
+        require(_isCanAttack(_zombieId));
+        require(_isCanAttack(_targetId));
+
+        // Kiểm tra xem Zombie nào chiến thắng
+        uint16 myZombieBattleTimes = ATTACK_COUNT_DEFAULT -
+            myZombie.attack_count;
+        uint16 enemyZombieBattleTimes = ATTACK_COUNT_DEFAULT -
+            enemyZombie.attack_count;
+        uint32 myZombieAtkCur = myZombie.attack.sub(
+            myZombie.attack.mul(5).div(100).mul(myZombieBattleTimes)
+        );
+        uint32 enemyZombieAtkSur = enemyZombie.attack.sub(
+            enemyZombie.attack.mul(5).div(100).mul(enemyZombieBattleTimes)
+        );
+        uint winnerZombieId = _targetId;
+        if (myZombieAtkCur > enemyZombieAtkSur) {
+            winnerZombieId = _zombieId;
+        } else if (myZombieAtkCur == enemyZombieAtkSur) {
+            if (myZombieBattleTimes >= enemyZombieBattleTimes) {
+                winnerZombieId = _zombieId;
+            }
         }
+
+        // Tính toán số exp nhận được
+        uint winnerLevel = 1;
+        if (winnerZombieId == _targetId) {
+            winnerLevel = enemyZombie.level;
+        } else {
+            winnerLevel = myZombie.level;
+        }
+        uint exp = calculateExp(winnerLevel);
+
+        // Tăng điểm kinh nghiệm cho Zombie
+        // Exp Zombie thua sẽ = 30% Zombie thắng
+        if (winnerZombieId == _targetId) {
+            updateZombie(enemyZombie, myZombie, exp);
+        } else {
+            updateZombie(myZombie, enemyZombie, exp);
+        }
+
+        // Pending Thưởng BTCS Token
+        //setTransfer(zombieToOwner[winnerZombieId], AMOUNT_REWARD * 10**uint256(18));
+
+        // Kiểm tra nếu Zombie đủ exp sẽ UpLevel + Attack
+        internalLevelUp(_zombieId);
+        internalLevelUp(_targetId);
+
+        console.log("WinnerId %s, myZombie ", winnerZombieId);
+
+        emit Battle(winnerZombieId, AMOUNT_REWARD, exp);
+    }
+
+    function calculateExp(uint level) private pure returns (uint) {
+        uint expCal = BASE_EXP;
+        for (uint i = 2; i <= level; i++) {
+            expCal = expCal.mul(105).div(100);
+        }
+        return expCal;
+    }
+
+    // Update các thông tin của Zombie: exp. a
+    function updateZombie(
+        Zombie storage winZombie,
+        Zombie storage lossZombie,
+        uint exp
+    ) internal {
+        winZombie.exp = winZombie.exp.add(exp);
+        lossZombie.exp = lossZombie.exp.add(exp.mul(30).div(100));
+        winZombie.winCount = winZombie.winCount.add(1);
+        lossZombie.lossCount = lossZombie.lossCount.add(1);
+        winZombie.attack_count = winZombie.attack_count.sub(1);
+        lossZombie.attack_count = lossZombie.attack_count.sub(1);
     }
 }
