@@ -10,12 +10,14 @@ contract ZombieAttack is ZombieHelper {
     using SafeMath32 for uint32;
     using SafeMath16 for uint16;
 
+    event FindBattle(uint _zombieId);
     event Battle(uint _zombieId, uint amout, uint exp);
+
+    constructor(address _token) ZombieHelper(_token) {}
 
     function findBattle(uint _zombieId)
         external
         onlyOwnerOf(_zombieId)
-        returns (Zombie memory)
     {
         // Kiểm tra Zombie còn lượt tấn công hay không?
         require(_isCanAttack(_zombieId));
@@ -24,9 +26,9 @@ contract ZombieAttack is ZombieHelper {
         require(_isNotOnlyOwner());
 
         // Tìm kiếm Zombie
-        int _targetId = randomZombie(_zombieId);
-        require(_targetId >= 0);
-        return zombies[uint(_targetId)];
+        uint _targetId = randomZombie(_zombieId);
+        require(_targetId < zombies.length);
+        emit FindBattle(_targetId);
     }
 
     function attack(uint _zombieId, uint _targetId)
@@ -76,8 +78,8 @@ contract ZombieAttack is ZombieHelper {
             updateZombie(myZombie, enemyZombie, exp);
         }
 
-        // Pending Thưởng BTCS Token
-        //setTransfer(zombieToOwner[winnerZombieId], AMOUNT_REWARD * 10**uint256(18));
+        // Thưởng BTCS Token
+        sendReward(zombieToOwner[winnerZombieId], AMOUNT_REWARD * 10**uint256(18));
 
         // Kiểm tra nếu Zombie đủ exp sẽ UpLevel + Attack
         internalLevelUp(_zombieId);

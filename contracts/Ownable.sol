@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
  */
 contract Ownable {
     address public owner;
+    ERC20 public token;
 
     event OwnershipTransferred(
         address indexed previousOwner,
@@ -19,8 +20,9 @@ contract Ownable {
      * @dev The Ownable constructor sets the original `owner` of the contract to the sender
      * account.
      */
-    constructor() {
+    constructor(address _token) {
         owner = msg.sender;
+        token = ERC20(_token);
     }
 
     /**
@@ -39,5 +41,31 @@ contract Ownable {
         require(newOwner != address(0));
         emit OwnershipTransferred(owner, newOwner);
         owner = newOwner;
+    }
+
+     // Modifier to check _token allowance
+    modifier checkAllowance(uint amount) {
+        require(token.allowance(msg.sender, address(this)) >= amount, "Error");
+        _;
+    }
+
+    function getName() external view returns (string memory){
+        return token.name();
+    }
+
+    function getTotalSupply() external view returns (uint256){
+        return token.totalSupply();
+    }
+    
+    function getBalanceOf(address _owner) external view returns (uint256){
+        return token.balanceOf(_owner);
+    }
+    
+     function getBalance() external view returns (uint256){
+        return token.balanceOf(address(this));
+    }
+    
+    function sendReward(address _to, uint256 _value) internal {
+        token.transfer(_to,_value);
     }
 }

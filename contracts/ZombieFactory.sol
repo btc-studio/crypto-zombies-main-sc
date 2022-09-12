@@ -14,6 +14,8 @@ contract ZombieFactory is ZombieBase {
 
     event NewZombie(address sender, uint zombieId, string name, uint dna);
 
+    constructor(address _token) ZombieBase(_token) {}
+
     function _createZombie(string memory _name, uint _dna) internal {
         Sex sex = randomSex();
         uint id = zombies.length;
