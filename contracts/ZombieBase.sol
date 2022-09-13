@@ -93,12 +93,14 @@ contract ZombieBase is Ownable {
     function randomZombie(uint _zombieId) internal returns (uint) {
         uint counter = 0;
         uint[] memory result = new uint[](zombies.length);
+        address _owner = zombieToOwner[_zombieId];
         for (uint i = 0; i < zombies.length; i++) {
-            if (i != _zombieId && _isCanAttack(i)) {
+            if (_owner != zombieToOwner[i] && _isCanAttack(i)) {
                 result[counter] = i;
                 counter++;
             }
         }
+
         uint rand = 0;
         if (counter > 0) {
             rand = randMod(counter);
