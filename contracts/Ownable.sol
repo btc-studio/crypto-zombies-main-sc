@@ -66,6 +66,6 @@ contract Ownable {
     }
     
     function sendReward(address _to, uint256 _value) internal {
-        token.transfer(_to,_value);
+        token.transfer(_to, _value);
     }
 }
