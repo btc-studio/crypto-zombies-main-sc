@@ -13,11 +13,23 @@ abstract contract ZombieOwnership is ZombieAttack, ERC721 {
 
     mapping(uint => address) zombieApprovals;
 
-    function balanceOf(address _owner) public override view returns (uint256 _balance) {
+    constructor(address _token) ZombieAttack(_token) {}
+
+    function balanceOf(address _owner)
+        public
+        view
+        override
+        returns (uint256 _balance)
+    {
         return ownerZombieCount[_owner];
     }
 
-    function ownerOf(uint256 _tokenId) public override view returns (address _owner) {
+    function ownerOf(uint256 _tokenId)
+        public
+        view
+        override
+        returns (address _owner)
+    {
         return zombieToOwner[_tokenId];
     }
 
@@ -40,7 +52,8 @@ abstract contract ZombieOwnership is ZombieAttack, ERC721 {
     }
 
     function approve(address _to, uint256 _tokenId)
-        public override
+        public
+        override
         onlyOwnerOf(_tokenId)
     {
         zombieApprovals[_tokenId] = _to;

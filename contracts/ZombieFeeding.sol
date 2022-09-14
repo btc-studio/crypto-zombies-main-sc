@@ -34,6 +34,8 @@ contract ZombieFeeding is ZombieFactory {
         _;
     }
 
+    constructor(address _token) ZombieFactory(_token) {}
+
     function setKittyContractAddress(address _address) external onlyOwner {
         kittyContract = KittyInterface(_address);
     }
@@ -47,11 +49,16 @@ contract ZombieFeeding is ZombieFactory {
     }
 
     function _isCanBreed(Zombie storage _zombie) internal view returns (bool) {
-        return (_zombie.level >= LVL_CAN_BREED && _zombie.breeds_points < MAX_BREEDING_POINTS);
+        return (_zombie.level >= LVL_CAN_BREED &&
+            _zombie.breeds_points < MAX_BREEDING_POINTS);
     }
 
-    function _stringNotEmptyOrNull(string memory input) internal pure returns (bool) {
-        return bytes(input).length > 0; 
+    function _stringNotEmptyOrNull(string memory input)
+        internal
+        pure
+        returns (bool)
+    {
+        return bytes(input).length > 0;
     }
 
     function feedAndMultiply(
@@ -79,21 +86,23 @@ contract ZombieFeeding is ZombieFactory {
         feedAndMultiply(_zombieId, kittyDna, "kitty");
     }
 
-    function _generateDna(uint dna1, uint dna2, string memory _name) private returns (uint) {
+    function _generateDna(
+        uint dna1,
+        uint dna2,
+        string memory _name
+    ) private returns (uint) {
         randNonce = randNonce.add(1);
         uint rand = uint(
-            keccak256(
-                abi.encodePacked(block.timestamp, dna1, dna2, _name)
-            )
+            keccak256(abi.encodePacked(block.timestamp, dna1, dna2, _name))
         );
         return rand % dnaModulus;
     }
 
-    function breedZombie(uint _fatherId, uint _motherId, string memory _name)
-        public
-        onlyOwnerOf(_fatherId)
-        onlyOwnerOf(_motherId)
-    {
+    function breedZombie(
+        uint _fatherId,
+        uint _motherId,
+        string memory _name
+    ) public onlyOwnerOf(_fatherId) onlyOwnerOf(_motherId) {
         Zombie storage father = zombies[_fatherId];
         Zombie storage mother = zombies[_motherId];
 
