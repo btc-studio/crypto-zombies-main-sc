@@ -36,25 +36,25 @@ contract ZombieBase is Ownable {
     uint randNonce = 0;
     uint16[] public EXP_UP_LEVEL = [
         100,
-        220,
-        258,
-        297,
-        342,
-        393,
-        451,
-        519,
-        597,
-        686,
-        789,
-        907,
-        1043,
-        1200,
-        1380,
-        1587,
-        1825,
-        2099,
-        2414,
-        2776
+        205,
+        315,
+        536,
+        878,
+        1237,
+        1835,
+        2463,
+        3122,
+        4156,
+        5601,
+        7118,
+        8711,
+        10982,
+        13366,
+        15869,
+        19125,
+        22544,
+        26793,
+        32289
     ];
 
     Zombie[] public zombies;
@@ -116,12 +116,11 @@ contract ZombieBase is Ownable {
     }
 
     function internalLevelUp(uint _zombieId) internal {
-        if (
-            zombies[_zombieId].exp >=
-            EXP_UP_LEVEL[zombies[_zombieId].level - 1] &&
-            zombies[_zombieId].level < LVL_MAX
+        while (
+            zombies[_zombieId].level < LVL_MAX &&
+            zombies[_zombieId].exp >= EXP_UP_LEVEL[zombies[_zombieId].level - 1]
         ) {
-            zombies[_zombieId].level++;
+            zombies[_zombieId].level = zombies[_zombieId].level.add(1);
             zombies[_zombieId].attack = zombies[_zombieId].attack.mul(105).div(
                 100
             );

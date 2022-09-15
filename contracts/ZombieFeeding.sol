@@ -127,6 +127,7 @@ contract ZombieFeeding is ZombieFactory {
         onlyOwnerOf(_zombieId)
     {
         Zombie storage zombie = zombies[_zombieId];
+        if (level >= LVL_MAX) level = LVL_MAX;
         zombie.level = level;
     }
 
