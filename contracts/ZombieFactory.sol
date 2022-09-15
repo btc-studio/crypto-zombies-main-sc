@@ -12,7 +12,14 @@ contract ZombieFactory is ZombieBase {
     using SafeMath32 for uint32;
     using SafeMath16 for uint16;
 
-    event NewZombie(address sender, uint zombieId, string name, uint dna);
+    event NewZombie(
+        address sender,
+        uint zombieId,
+        string name,
+        uint dna,
+        Sex sex,
+        uint32 level
+    );
 
     constructor(address _token) ZombieBase(_token) {}
 
@@ -37,7 +44,7 @@ contract ZombieFactory is ZombieBase {
         );
         zombieToOwner[id] = msg.sender;
         ownerZombieCount[msg.sender] = ownerZombieCount[msg.sender].add(1);
-        emit NewZombie(msg.sender, id, _name, _dna);
+        emit NewZombie(msg.sender, id, _name, _dna, sex, 1);
     }
 
     function _generateRandomDna(string memory _str) private returns (uint) {
