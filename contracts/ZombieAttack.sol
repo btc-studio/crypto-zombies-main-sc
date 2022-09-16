@@ -15,10 +15,7 @@ contract ZombieAttack is ZombieHelper {
 
     constructor(address _token) ZombieHelper(_token) {}
 
-    function findBattle(uint _zombieId)
-        external
-        onlyOwnerOf(_zombieId)
-    {
+    function findBattle(uint _zombieId) public view returns (uint) {
         // Kiểm tra Zombie còn lượt tấn công hay không?
         require(_isCanAttack(_zombieId));
 
@@ -28,7 +25,7 @@ contract ZombieAttack is ZombieHelper {
         // Tìm kiếm Zombie
         uint _targetId = randomZombie(_zombieId);
         require(_targetId < zombies.length);
-        emit FindBattle(_targetId);
+        return _targetId;
     }
 
     function attack(uint _zombieId, uint _targetId)
@@ -79,7 +76,10 @@ contract ZombieAttack is ZombieHelper {
         }
 
         // Thưởng BTCS Token
-        sendReward(zombieToOwner[winnerZombieId], AMOUNT_REWARD * 10**uint256(18));
+        sendReward(
+            zombieToOwner[winnerZombieId],
+            AMOUNT_REWARD * 10**uint256(18)
+        );
 
         // Kiểm tra nếu Zombie đủ exp sẽ UpLevel + Attack
         internalLevelUp(_zombieId);
