@@ -90,7 +90,7 @@ contract ZombieBase is Ownable {
         return rand;
     }
 
-    function randomZombie(uint _zombieId) internal returns (uint) {
+    function randomZombie(uint _zombieId) internal view returns (uint) {
         uint counter = 0;
         uint[] memory result = new uint[](zombies.length);
         address _owner = zombieToOwner[_zombieId];
@@ -103,7 +103,7 @@ contract ZombieBase is Ownable {
 
         uint rand = 0;
         if (counter > 0) {
-            rand = randMod(counter);
+            rand = uint(keccak256(abi.encodePacked(block.timestamp))) % counter;
             return result[rand];
         }
 
