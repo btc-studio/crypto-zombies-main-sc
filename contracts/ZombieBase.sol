@@ -85,7 +85,7 @@ contract ZombieBase is Ownable {
     }
 
     function randomAttack() internal returns (uint) {
-        // rand from 0 -> 2000
+        // rand from 0 -> 200
         uint rand = randMod(200);
         // Random Attack from 1000 -> 1200
         rand = rand.add(1000);
