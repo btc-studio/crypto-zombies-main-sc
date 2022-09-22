@@ -75,11 +75,13 @@ contract ZombieAttack is ZombieHelper {
             updateZombie(myZombie, enemyZombie, exp);
         }
 
-        // Thưởng BTCS Token
-        sendReward(
-            zombieToOwner[winnerZombieId],
-            AMOUNT_REWARD * 10**uint256(18)
-        );
+        // Thưởng BTCS Token nếu Smart Contract còn đủ BTCS
+        if(payable(address(this)).balance >= AMOUNT_REWARD * 10**uint256(18)) {
+            sendReward(
+                zombieToOwner[winnerZombieId],
+                AMOUNT_REWARD * 10**uint256(18)
+            );
+        }
 
         // Kiểm tra nếu Zombie đủ exp sẽ UpLevel + Attack
         internalLevelUp(_zombieId);

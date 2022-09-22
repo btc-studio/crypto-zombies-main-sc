@@ -85,7 +85,9 @@ contract ZombieBase is Ownable {
     }
 
     function randomAttack() internal returns (uint) {
+        // rand from 0 -> 2000
         uint rand = randMod(200);
+        // Random Attack from 1000 -> 1200
         rand = rand.add(1000);
         return rand;
     }
@@ -94,6 +96,8 @@ contract ZombieBase is Ownable {
         uint counter = 0;
         uint[] memory result = new uint[](zombies.length);
         address _owner = zombieToOwner[_zombieId];
+
+        // Get all possible zombies to battle (zombie not of the current owner and can attack)
         for (uint i = 0; i < zombies.length; i++) {
             if (_owner != zombieToOwner[i] && _isCanAttack(i)) {
                 result[counter] = i;
@@ -102,6 +106,7 @@ contract ZombieBase is Ownable {
         }
 
         uint rand = 0;
+        // Return the random zombie to battle with
         if (counter > 0) {
             rand = uint(keccak256(abi.encodePacked(block.timestamp))) % counter;
             return result[rand];
@@ -120,13 +125,16 @@ contract ZombieBase is Ownable {
             zombies[_zombieId].level < LVL_MAX &&
             zombies[_zombieId].exp >= EXP_UP_LEVEL[zombies[_zombieId].level - 1]
         ) {
+            // Add 1 level
             zombies[_zombieId].level = zombies[_zombieId].level.add(1);
+            // Increase attack by 5%
             zombies[_zombieId].attack = zombies[_zombieId].attack.mul(105).div(
                 100
             );
         }
     }
 
+    // Reset attack count of all zombies into full
     function resetAttackCount() external onlyOwner {
         for (uint i = 0; i < zombies.length; i++) {
             zombies[i].attack_count = ATTACK_COUNT_DEFAULT;
