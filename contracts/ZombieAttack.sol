@@ -40,19 +40,19 @@ contract ZombieAttack is ZombieHelper {
 
         // Kiểm tra xem Zombie nào chiến thắng
         uint16 myZombieBattleTimes = ATTACK_COUNT_DEFAULT -
-            myZombie.attack_count;
+            myZombie.attackCount;
         uint16 enemyZombieBattleTimes = ATTACK_COUNT_DEFAULT -
-            enemyZombie.attack_count;
+            enemyZombie.attackCount;
         uint32 myZombieAtkCur = myZombie.attack.sub(
             myZombie.attack.mul(5).div(100).mul(myZombieBattleTimes)
         );
-        uint32 enemyZombieAtkSur = enemyZombie.attack.sub(
+        uint32 enemyZombieAtkCur = enemyZombie.attack.sub(
             enemyZombie.attack.mul(5).div(100).mul(enemyZombieBattleTimes)
         );
         uint winnerZombieId = _targetId;
-        if (myZombieAtkCur > enemyZombieAtkSur) {
+        if (myZombieAtkCur > enemyZombieAtkCur) {
             winnerZombieId = _zombieId;
-        } else if (myZombieAtkCur == enemyZombieAtkSur) {
+        } else if (myZombieAtkCur == enemyZombieAtkCur) {
             if (myZombieBattleTimes >= enemyZombieBattleTimes) {
                 winnerZombieId = _zombieId;
             }
@@ -76,12 +76,11 @@ contract ZombieAttack is ZombieHelper {
         }
 
         // Thưởng BTCS Token nếu Smart Contract còn đủ BTCS
-        if(payable(address(this)).balance >= AMOUNT_REWARD * 10**uint256(18)) {
-            sendReward(
-                zombieToOwner[winnerZombieId],
-                AMOUNT_REWARD * 10**uint256(18)
-            );
-        }
+        // TODO: Cần 1 cơ chế đảm bảo thưởng cho user khi hết đồng BTCS
+        sendReward(
+            zombieToOwner[winnerZombieId],
+            AMOUNT_REWARD * 10**uint256(18)
+        );
 
         // Kiểm tra nếu Zombie đủ exp sẽ UpLevel + Attack
         internalLevelUp(_zombieId);
@@ -110,7 +109,7 @@ contract ZombieAttack is ZombieHelper {
         lossZombie.exp = lossZombie.exp.add(exp.mul(30).div(100));
         winZombie.winCount = winZombie.winCount.add(1);
         lossZombie.lossCount = lossZombie.lossCount.add(1);
-        winZombie.attack_count = winZombie.attack_count.sub(1);
-        lossZombie.attack_count = lossZombie.attack_count.sub(1);
+        winZombie.attackCount = winZombie.attackCount.sub(1);
+        lossZombie.attackCount = lossZombie.attackCount.sub(1);
     }
 }

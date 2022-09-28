@@ -27,10 +27,10 @@ contract ZombieBase is Ownable {
         uint32 readyTime;
         uint16 winCount;
         uint16 lossCount;
-        uint16 breeds_points;
+        uint16 breedCount;
         Sex sex;
         uint32 attack;
-        uint16 attack_count;
+        uint16 attackCount;
         uint exp;
     }
     uint randNonce = 0;
@@ -117,7 +117,7 @@ contract ZombieBase is Ownable {
 
     function _isCanAttack(uint _zombieId) internal view returns (bool) {
         Zombie memory _zombie = zombies[_zombieId];
-        return (_zombie.attack_count > 0);
+        return (_zombie.attackCount > 0);
     }
 
     function internalLevelUp(uint _zombieId) internal {
@@ -137,7 +137,7 @@ contract ZombieBase is Ownable {
     // Reset attack count of all zombies into full
     function resetAttackCount() external onlyOwner {
         for (uint i = 0; i < zombies.length; i++) {
-            zombies[i].attack_count = ATTACK_COUNT_DEFAULT;
+            zombies[i].attackCount = ATTACK_COUNT_DEFAULT;
         }
     }
 }

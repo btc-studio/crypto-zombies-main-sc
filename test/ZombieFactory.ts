@@ -33,6 +33,8 @@ describe("ZombieFactory", function () {
 
             const zombie = await zombieFactory.connect(addr1).findBattle(0);
             console.log(zombie);
+
+            const attack = await zombieFactory.connect(addr1).attack(0, 1);
         });
     });
 });
