@@ -50,7 +50,7 @@ contract ZombieFeeding is ZombieFactory {
 
     function _isCanBreed(Zombie storage _zombie) internal view returns (bool) {
         return (_zombie.level >= LVL_CAN_BREED &&
-            _zombie.breeds_points < MAX_BREEDING_POINTS);
+            _zombie.breedCount < MAX_BREEDING_POINTS);
     }
 
     function _stringNotEmptyOrNull(string memory input)
@@ -113,8 +113,8 @@ contract ZombieFeeding is ZombieFactory {
         require(father.sex != mother.sex);
 
         // Add số lượt sinh sản
-        father.breeds_points = father.breeds_points.add(1);
-        mother.breeds_points = mother.breeds_points.add(1);
+        father.breedCount = father.breedCount.add(1);
+        mother.breedCount = mother.breedCount.add(1);
         // Tinh toán DNA Zombie con từ DNA của bố mẹ
         uint newKittyDna = _generateDna(father.dna, mother.dna, _name);
         _createZombie(_name, newKittyDna);

@@ -60,11 +60,11 @@ contract Ownable {
     function getBalanceOf(address _owner) external view returns (uint256){
         return token.balanceOf(_owner);
     }
-    
-     function getBalance() external view returns (uint256){
+
+    function getBalance() external view returns (uint256){
         return token.balanceOf(address(this));
     }
-    
+
     function sendReward(address _to, uint256 _value) internal {
         token.transfer(_to, _value);
     }
