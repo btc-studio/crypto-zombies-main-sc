@@ -66,9 +66,9 @@ contract ZombieBase is Ownable {
 
     Zombie[] public zombies;
 
-    mapping(uint => address) public zombieToOwner;  // Maping zombieId to its owner
-    mapping(address => uint) ownerZombieCount;      // Mapping Owner to his/her zombie count
-    mapping(string => uint) rarityToGrowStat;       // Mapping rarity to grow stat ('A' -> 9, 'S' -> 11)
+    mapping(uint => address) public zombieToOwner; 
+    mapping(address => uint) ownerZombieCount;
+    mapping(string => uint) rarityToGrowStat; // Mapping rarity to grow stat ('A' -> 9, 'S' -> 11)
 
 
     enum Sex {
@@ -101,7 +101,7 @@ contract ZombieBase is Ownable {
     }
 
     function randomAttack() internal returns (uint) {
-        // rand from 0 -> 200
+        // Random from 0 -> 200
         uint rand = randMod(200);
         // Random Attack from 1000 -> 1200
         rand = rand.add(1000);

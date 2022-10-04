@@ -33,7 +33,6 @@ describe("ZombieFactory", function () {
 
             const zom1 = await zombieFactory.getZombiesByOwner(addr1.address);
             console.log(zom1);
-
         });
     });
 
@@ -51,9 +50,6 @@ describe("ZombieFactory", function () {
                 .createRandomZombie("Duong1");
 
             const zombie = await zombieFactory.connect(addr1).findBattle(0);
-            // console.log(zombie);
-
-            // const attack = await zombieFactory.connect(addr1).attack(0, 1);
         });
     });
 });

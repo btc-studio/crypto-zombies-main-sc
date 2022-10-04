@@ -11,18 +11,18 @@ contract ZombieAttack is ZombieHelper {
     using SafeMath16 for uint16;
 
     event FindBattle(uint _zombieId);
-    event Battle(uint _zombieId, uint amount, uint winnerExp, uint loserExp);
+    event onRewardUser(uint _zombieId, uint amount, uint winnerExp, uint loserExp);
 
     constructor(address _token) ZombieHelper(_token) {}
 
     function findBattle(uint _zombieId) public view returns (uint) {
-        // Kiểm tra Zombie còn lượt tấn công hay không?
+        // Check if the Zombie has enough attack count or not
         require(_isCanAttack(_zombieId));
 
-        // Kiểm tra nếu chỉ có 1 ví sở hữu Zombie thì sẽ trả về lỗi
+        // If there is only 1 address has zombie in the SC -> Return error
         require(_isNotOnlyOwner());
 
-        // Tìm kiếm Zombie
+        // Find Zombie
         uint _targetId = randomZombie(_zombieId);
         require(_targetId < zombies.length);
         return _targetId;
@@ -34,11 +34,11 @@ contract ZombieAttack is ZombieHelper {
     {
         Zombie storage myZombie = zombies[_zombieId];
         Zombie storage enemyZombie = zombies[_targetId];
-        // Kiểm tra Zombie còn lượt tấn công hay không?
+        // Check if the Zombie has enough attack count or not
         require(_isCanAttack(_zombieId));
         require(_isCanAttack(_targetId));
 
-        // Kiểm tra xem Zombie nào chiến thắng
+        // Check what zombie wins
         uint16 myZombieBattleTimes = ATTACK_COUNT_DEFAULT -
             myZombie.attackCount;
         uint16 enemyZombieBattleTimes = ATTACK_COUNT_DEFAULT -
@@ -54,7 +54,7 @@ contract ZombieAttack is ZombieHelper {
             }
         }
 
-        // Tính toán số exp nhận được
+        // Calculate the amount of exp received
         uint winnerLevel = 1;
         uint loserLevel = 1;
         if (winnerZombieId == _targetId) {
@@ -68,27 +68,25 @@ contract ZombieAttack is ZombieHelper {
         uint winnerExp = calculateWinnerExp(winnerLevel);
         uint loserExp = calculateLoserExp(loserLevel);
 
-        // Tăng điểm kinh nghiệm cho Zombie
-        // Winner: EXP = 50 + 5*(level-1)
-        // Loser: EXP = 12 + 5*(level-1)
+        // Incease zombie's exp
         if (winnerZombieId == _targetId) {
             updateZombie(enemyZombie, myZombie, winnerExp, loserExp);
         } else {
             updateZombie(myZombie, enemyZombie, winnerExp, loserExp);
         }
 
-        // Thưởng BTCS Token nếu Smart Contract còn đủ BTCS
-        // TODO: Cần 1 cơ chế đảm bảo thưởng cho user khi hết đồng BTCS
+        // Reward BTCS Token if the Smart Contract has enough BTCS
+        // TODO: Need a mechanism to ensure the reward for user when SC is out of BTCS Token
         sendReward(
             zombieToOwner[winnerZombieId],
             AMOUNT_REWARD * 10**uint256(18)
         );
 
-        // Kiểm tra nếu Zombie đủ exp sẽ UpLevel + Attack
+        // Check if the Zombie has enough exp -> UpLevel + Attack
         internalLevelUp(_zombieId);
         internalLevelUp(_targetId);
 
-        emit Battle(winnerZombieId, AMOUNT_REWARD, winnerExp, loserExp);
+        emit onRewardUser(winnerZombieId, AMOUNT_REWARD, winnerExp, loserExp);
     }
 
     // Winner: EXP = 50 + 5*(level-1)
@@ -103,7 +101,7 @@ contract ZombieAttack is ZombieHelper {
         return exp;
     }
 
-    // Update các thông tin của Zombie: exp
+    // Update Zombie's information: exp, winCount, lossCount
     function updateZombie(
         Zombie storage winZombie,
         Zombie storage lossZombie,

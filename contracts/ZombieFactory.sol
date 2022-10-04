@@ -12,6 +12,15 @@ contract ZombieFactory is ZombieBase {
     using SafeMath32 for uint32;
     using SafeMath16 for uint16;
 
+    uint8 constant public BASE_HEALTH_POINT = 10;
+    uint8 constant public BASE_ATTACK = 10;
+    uint8 constant public BASE_DEFENSE = 10;
+    uint8 constant public BASE_CRIT_RATE = 10;
+    uint8 constant public BASE_CRIT_DAMAGE = 10;
+    uint8 constant public BASE_SPEED = 10;
+    uint8 constant public BASE_COMBAT_POWER = 60;
+    string constant public BASE_RARITY = 'A';
+
     event NewZombie(
         address sender,
         uint zombieId,
@@ -37,15 +46,15 @@ contract ZombieFactory is ZombieBase {
                 0,
                 0,
                 sex,
-                10,
-                10,
-                10,
-                10,
-                10,
-                10,
-                60,
+                BASE_HEALTH_POINT,
+                BASE_ATTACK,
+                BASE_DEFENSE,
+                BASE_CRIT_RATE,
+                BASE_CRIT_DAMAGE,
+                BASE_SPEED,
+                BASE_COMBAT_POWER,
                 ATTACK_COUNT_DEFAULT,
-                'A',
+                BASE_RARITY,
                 0
             )
         );
