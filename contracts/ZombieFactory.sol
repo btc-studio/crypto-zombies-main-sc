@@ -37,8 +37,15 @@ contract ZombieFactory is ZombieBase {
                 0,
                 0,
                 sex,
-                uint16(randomAttack()),
+                10,
+                10,
+                10,
+                10,
+                10,
+                10,
+                60,
                 ATTACK_COUNT_DEFAULT,
+                'A',
                 0
             )
         );

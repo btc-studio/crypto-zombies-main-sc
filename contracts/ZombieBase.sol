@@ -29,8 +29,15 @@ contract ZombieBase is Ownable {
         uint16 lossCount;
         uint16 breedCount;
         Sex sex;
+        uint32 healthPoint;
         uint32 attack;
+        uint32 defense;
+        uint32 criticalRate;
+        uint32 criticalDamage;
+        uint32 speed;
+        uint32 combatPower;
         uint16 attackCount;
+        string rarity;
         uint exp;
     }
     uint randNonce = 0;
@@ -59,15 +66,24 @@ contract ZombieBase is Ownable {
 
     Zombie[] public zombies;
 
-    mapping(uint => address) public zombieToOwner;
-    mapping(address => uint) ownerZombieCount;
+    mapping(uint => address) public zombieToOwner;  // Maping zombieId to its owner
+    mapping(address => uint) ownerZombieCount;      // Mapping Owner to his/her zombie count
+    mapping(string => uint) rarityToGrowStat;       // Mapping rarity to grow stat ('A' -> 9, 'S' -> 11)
+
 
     enum Sex {
         Male,
         Female
     }
 
-    constructor(address _token) Ownable(_token) {}
+    constructor(address _token) Ownable(_token) {
+        rarityToGrowStat['C'] = 6;
+        rarityToGrowStat['B'] = 8;
+        rarityToGrowStat['A'] = 9;
+        rarityToGrowStat['S'] = 11;
+        rarityToGrowStat['SS'] = 15;
+        rarityToGrowStat['SSS'] = 20;
+    }
 
     function randMod(uint _modulus) internal returns (uint) {
         randNonce = randNonce.add(1);
@@ -127,10 +143,8 @@ contract ZombieBase is Ownable {
         ) {
             // Add 1 level
             zombies[_zombieId].level = zombies[_zombieId].level.add(1);
-            // Increase attack by 5%
-            zombies[_zombieId].attack = zombies[_zombieId].attack.mul(105).div(
-                100
-            );
+            // Increase attack by 1 -> 3
+            zombies[_zombieId].attack = zombies[_zombieId].attack.add(1); 
         }
     }
 

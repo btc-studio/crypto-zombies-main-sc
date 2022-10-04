@@ -11,7 +11,7 @@ contract ZombieAttack is ZombieHelper {
     using SafeMath16 for uint16;
 
     event FindBattle(uint _zombieId);
-    event Battle(uint _zombieId, uint amout, uint exp);
+    event Battle(uint _zombieId, uint amount, uint winnerExp, uint loserExp);
 
     constructor(address _token) ZombieHelper(_token) {}
 
@@ -43,12 +43,8 @@ contract ZombieAttack is ZombieHelper {
             myZombie.attackCount;
         uint16 enemyZombieBattleTimes = ATTACK_COUNT_DEFAULT -
             enemyZombie.attackCount;
-        uint32 myZombieAtkCur = myZombie.attack.sub(
-            myZombie.attack.mul(5).div(100).mul(myZombieBattleTimes)
-        );
-        uint32 enemyZombieAtkCur = enemyZombie.attack.sub(
-            enemyZombie.attack.mul(5).div(100).mul(enemyZombieBattleTimes)
-        );
+        uint32 myZombieAtkCur = myZombie.attack;
+        uint32 enemyZombieAtkCur = enemyZombie.attack;
         uint winnerZombieId = _targetId;
         if (myZombieAtkCur > enemyZombieAtkCur) {
             winnerZombieId = _zombieId;
@@ -60,19 +56,25 @@ contract ZombieAttack is ZombieHelper {
 
         // Tính toán số exp nhận được
         uint winnerLevel = 1;
+        uint loserLevel = 1;
         if (winnerZombieId == _targetId) {
             winnerLevel = enemyZombie.level;
+            loserLevel = myZombie.level;
         } else {
             winnerLevel = myZombie.level;
+            loserLevel = enemyZombie.level;
         }
-        uint exp = calculateExp(winnerLevel);
+
+        uint winnerExp = calculateWinnerExp(winnerLevel);
+        uint loserExp = calculateLoserExp(loserLevel);
 
         // Tăng điểm kinh nghiệm cho Zombie
-        // Exp Zombie thua sẽ = 30% Zombie thắng
+        // Winner: EXP = 50 + 5*(level-1)
+        // Loser: EXP = 12 + 5*(level-1)
         if (winnerZombieId == _targetId) {
-            updateZombie(enemyZombie, myZombie, exp);
+            updateZombie(enemyZombie, myZombie, winnerExp, loserExp);
         } else {
-            updateZombie(myZombie, enemyZombie, exp);
+            updateZombie(myZombie, enemyZombie, winnerExp, loserExp);
         }
 
         // Thưởng BTCS Token nếu Smart Contract còn đủ BTCS
@@ -86,27 +88,30 @@ contract ZombieAttack is ZombieHelper {
         internalLevelUp(_zombieId);
         internalLevelUp(_targetId);
 
-        console.log("WinnerId %s, myZombie ", winnerZombieId);
-
-        emit Battle(winnerZombieId, AMOUNT_REWARD, exp);
+        emit Battle(winnerZombieId, AMOUNT_REWARD, winnerExp, loserExp);
     }
 
-    function calculateExp(uint level) private pure returns (uint) {
-        uint expCal = BASE_EXP;
-        for (uint i = 2; i <= level; i++) {
-            expCal = expCal.mul(105).div(100);
-        }
-        return expCal;
+    // Winner: EXP = 50 + 5*(level-1)
+    function calculateWinnerExp(uint level) private pure returns (uint) {
+        uint exp = level.sub(1).mul(5).add(50);
+        return exp;
     }
 
-    // Update các thông tin của Zombie: exp. a
+    // Loser: EXP = 12 + 5*(level-1)
+    function calculateLoserExp(uint level) private pure returns (uint) {
+        uint exp = level.sub(1).mul(5).add(12);
+        return exp;
+    }
+
+    // Update các thông tin của Zombie: exp
     function updateZombie(
         Zombie storage winZombie,
         Zombie storage lossZombie,
-        uint exp
+        uint winnerExp,
+        uint loserExp
     ) internal {
-        winZombie.exp = winZombie.exp.add(exp);
-        lossZombie.exp = lossZombie.exp.add(exp.mul(30).div(100));
+        winZombie.exp = winZombie.exp.add(winnerExp);
+        lossZombie.exp = lossZombie.exp.add(loserExp);
         winZombie.winCount = winZombie.winCount.add(1);
         lossZombie.lossCount = lossZombie.lossCount.add(1);
         winZombie.attackCount = winZombie.attackCount.sub(1);
