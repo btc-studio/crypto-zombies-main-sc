@@ -11,7 +11,7 @@ contract ZombieAttack is ZombieHelper {
     using SafeMath16 for uint16;
 
     event FindBattle(uint _zombieId);
-    event onRewardUser(uint _zombieId, uint amount, uint winnerExp, uint loserExp);
+    event RewardUser(uint _zombieId, uint amount, uint winnerExp, uint loserExp);
 
     constructor(address _token) ZombieHelper(_token) {}
 
@@ -86,7 +86,7 @@ contract ZombieAttack is ZombieHelper {
         internalLevelUp(_zombieId);
         internalLevelUp(_targetId);
 
-        emit onRewardUser(winnerZombieId, AMOUNT_REWARD, winnerExp, loserExp);
+        emit RewardUser(winnerZombieId, AMOUNT_REWARD, winnerExp, loserExp);
     }
 
     // Winner: EXP = 50 + 5*(level-1)
