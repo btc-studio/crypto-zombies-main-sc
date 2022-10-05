@@ -16,7 +16,7 @@ A solidity smart contract for the Ethereum based zombie game.
 
 ### Compile
 ```shell
-yarn complie
+yarn compile
 ```
 ### Deploy
 ```shell

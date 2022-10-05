@@ -61,4 +61,8 @@ contract ZombieHelper is ZombieFeeding {
         }
         return result;
     }
+
+    function _getNumberZombies() internal view returns (uint) {
+        return ownerZombieCount[msg.sender];
+    }
 }

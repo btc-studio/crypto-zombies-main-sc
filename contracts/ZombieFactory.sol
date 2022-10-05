@@ -6,20 +6,22 @@ import "hardhat/console.sol";
 import "./Ownable.sol";
 import "./SafeMath.sol";
 import "./ZombieBase.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract ZombieFactory is ZombieBase {
     using SafeMath for uint256;
     using SafeMath32 for uint32;
     using SafeMath16 for uint16;
 
-    uint8 constant public BASE_HEALTH_POINT = 10;
-    uint8 constant public BASE_ATTACK = 10;
-    uint8 constant public BASE_DEFENSE = 10;
-    uint8 constant public BASE_CRIT_RATE = 10;
-    uint8 constant public BASE_CRIT_DAMAGE = 10;
-    uint8 constant public BASE_SPEED = 10;
-    uint8 constant public BASE_COMBAT_POWER = 60;
-    string constant public BASE_RARITY = 'A';
+    uint8 public constant BASE_HEALTH_POINT = 10;
+    uint8 public constant BASE_ATTACK = 10;
+    uint8 public constant BASE_DEFENSE = 10;
+    uint8 public constant BASE_CRIT_RATE = 10;
+    uint8 public constant BASE_CRIT_DAMAGE = 10;
+    uint8 public constant BASE_SPEED = 10;
+    uint8 public constant BASE_COMBAT_POWER = 60;
+    string public constant BASE_RARITY = "A";
+    uint public constant BASE_NAME = 1000000;
 
     event NewZombie(
         address sender,
@@ -32,35 +34,47 @@ contract ZombieFactory is ZombieBase {
 
     constructor(address _token) ZombieBase(_token) {}
 
-    function _createZombie(string memory _name, uint _dna) internal {
+    function _createZombie(string memory _name, uint _dna)
+        internal
+        returns (Zombie memory)
+    {
         Sex sex = randomSex();
         uint id = zombies.length;
-        zombies.push(
-            Zombie(
-                id,
-                _name,
-                _dna,
-                1,
-                uint32(block.timestamp + cooldownTime),
-                0,
-                0,
-                0,
-                sex,
-                BASE_HEALTH_POINT,
-                BASE_ATTACK,
-                BASE_DEFENSE,
-                BASE_CRIT_RATE,
-                BASE_CRIT_DAMAGE,
-                BASE_SPEED,
-                BASE_COMBAT_POWER,
-                ATTACK_COUNT_DEFAULT,
-                BASE_RARITY,
-                0
-            )
+        string memory _realName = _name;
+
+        // If zombie's name is null then set name = BASE_NAME + id
+        if (bytes(_realName).length == 0) {
+            _realName = Strings.toString(BASE_NAME + id);
+        }
+
+        Zombie memory zombie = Zombie(
+            id,
+            _realName,
+            _dna,
+            1,
+            uint32(block.timestamp + cooldownTime),
+            0,
+            0,
+            0,
+            sex,
+            BASE_HEALTH_POINT,
+            BASE_ATTACK,
+            BASE_DEFENSE,
+            BASE_CRIT_RATE,
+            BASE_CRIT_DAMAGE,
+            BASE_SPEED,
+            BASE_COMBAT_POWER,
+            ATTACK_COUNT_DEFAULT,
+            BASE_RARITY,
+            0
         );
+
+        zombies.push(zombie);
         zombieToOwner[id] = msg.sender;
         ownerZombieCount[msg.sender] = ownerZombieCount[msg.sender].add(1);
         emit NewZombie(msg.sender, id, _name, _dna, sex, 1);
+
+        return zombie;
     }
 
     function _generateRandomDna(string memory _str) private returns (uint) {
@@ -73,9 +87,22 @@ contract ZombieFactory is ZombieBase {
         return rand % dnaModulus;
     }
 
-    function createRandomZombie(string memory _name) public {
+    function createRandomZombie(string memory _name)
+        public
+        returns (Zombie memory)
+    {
         uint randDna = _generateRandomDna(_name);
         randDna = randDna - (randDna % 100);
-        _createZombie(_name, randDna);
+        return _createZombie(_name, randDna);
+    }
+
+    function createManyZombie(uint count) public returns (Zombie[] memory) {
+        uint i;
+        Zombie[] memory zombies = new Zombie[](count);
+        for (i = 0; i < count; i += 1) {
+            zombies[i] = createRandomZombie("");
+        }
+
+        return zombies;
     }
 }
