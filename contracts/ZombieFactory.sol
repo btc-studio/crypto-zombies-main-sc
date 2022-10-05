@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.16;
 
-// Import this file to use console.log
-import "hardhat/console.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "./Ownable.sol";
 import "./SafeMath.sol";
 import "./ZombieBase.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract ZombieFactory is ZombieBase {
     using SafeMath for uint256;
@@ -34,6 +32,29 @@ contract ZombieFactory is ZombieBase {
 
     constructor(address _token) ZombieBase(_token) {}
 
+    // external method: order view -> pure
+
+    // public method
+    function createRandomZombie(string memory _name)
+        public
+        returns (Zombie memory)
+    {
+        uint randDna = _generateRandomDna(_name);
+        randDna = randDna - (randDna % 100);
+        return _createZombie(_name, randDna);
+    }
+
+    function createManyZombie(uint count) public returns (Zombie[] memory) {
+        uint i;
+        Zombie[] memory zombies = new Zombie[](count);
+        for (i = 0; i < count; i += 1) {
+            zombies[i] = createRandomZombie("");
+        }
+
+        return zombies;
+    }
+
+    // internal method
     function _createZombie(string memory _name, uint _dna)
         internal
         returns (Zombie memory)
@@ -77,6 +98,7 @@ contract ZombieFactory is ZombieBase {
         return zombie;
     }
 
+    // private method
     function _generateRandomDna(string memory _str) private returns (uint) {
         randNonce = randNonce.add(1);
         uint rand = uint(
@@ -85,24 +107,5 @@ contract ZombieFactory is ZombieBase {
             )
         );
         return rand % dnaModulus;
-    }
-
-    function createRandomZombie(string memory _name)
-        public
-        returns (Zombie memory)
-    {
-        uint randDna = _generateRandomDna(_name);
-        randDna = randDna - (randDna % 100);
-        return _createZombie(_name, randDna);
-    }
-
-    function createManyZombie(uint count) public returns (Zombie[] memory) {
-        uint i;
-        Zombie[] memory zombies = new Zombie[](count);
-        for (i = 0; i < count; i += 1) {
-            zombies[i] = createRandomZombie("");
-        }
-
-        return zombies;
     }
 }
