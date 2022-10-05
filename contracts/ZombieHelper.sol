@@ -13,6 +13,7 @@ contract ZombieHelper is ZombieFeeding {
 
     constructor(address _token) ZombieFeeding(_token) {}
 
+    // external method: order: view -> pure
     function withdraw() external onlyOwner {
         payable(owner).transfer(address(this).balance);
     }
@@ -42,10 +43,6 @@ contract ZombieHelper is ZombieFeeding {
         zombies[_zombieId].dna = _newDna;
     }
 
-    function _isNotOnlyOwner() public view returns (bool) {
-        return ownerZombieCount[msg.sender] != zombies.length;
-    }
-
     function getZombiesByOwner(address _owner)
         external
         view
@@ -61,4 +58,20 @@ contract ZombieHelper is ZombieFeeding {
         }
         return result;
     }
+
+    // public method
+    function _isNotOnlyOwner() public view returns (bool) {
+        return ownerZombieCount[msg.sender] != zombies.length;
+    }
+
+    // internal method
+    function _getNumberZombiesOfOwner(address _owner)
+        internal
+        view
+        returns (uint)
+    {
+        return ownerZombieCount[_owner];
+    }
+
+    // private method
 }
