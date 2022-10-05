@@ -2,6 +2,7 @@
 pragma solidity ^0.8.16;
 import "./Ownable.sol";
 import "./SafeMath.sol";
+import "hardhat/console.sol";
 
 uint8 constant MAX_BREEDING_POINTS = 8;
 uint8 constant LVL_CAN_BREED = 10;
@@ -41,27 +42,27 @@ contract ZombieBase is Ownable {
         uint exp;
     }
     uint randNonce = 0;
-    uint16[] public EXP_UP_LEVEL = [
-        100,
-        205,
-        315,
-        536,
-        878,
-        1237,
-        1835,
-        2463,
-        3122,
-        4156,
-        5601,
-        7118,
-        8711,
-        10982,
-        13366,
-        15869,
-        19125,
-        22544,
-        26793,
-        32289
+    uint32[] public EXP_UP_LEVEL = [
+        8,
+        280,
+        742,
+        1444,
+        2434,
+        3760,
+        5451,
+        7651,
+        10291,
+        13411,
+        17051,
+        21251,
+        26051,
+        31457,
+        37541,
+        39296,
+        43806,
+        50944,
+        60709,
+        73211
     ];
 
     Zombie[] public zombies;
@@ -69,7 +70,6 @@ contract ZombieBase is Ownable {
     mapping(uint => address) public zombieToOwner; 
     mapping(address => uint) ownerZombieCount;
     mapping(string => uint) rarityToGrowStat; // Mapping rarity to grow stat ('A' -> 9, 'S' -> 11)
-
 
     enum Sex {
         Male,
@@ -101,9 +101,9 @@ contract ZombieBase is Ownable {
     }
 
     function randomAttack() internal returns (uint) {
-        // Random from 0 -> 200
+        // Random from 0 -> 199
         uint rand = randMod(200);
-        // Random Attack from 1000 -> 1200
+        // Random Attack from 1000 -> 1199
         rand = rand.add(1000);
         return rand;
     }
@@ -143,8 +143,62 @@ contract ZombieBase is Ownable {
         ) {
             // Add 1 level
             zombies[_zombieId].level = zombies[_zombieId].level.add(1);
-            // Increase attack by 1 -> 3
-            zombies[_zombieId].attack = zombies[_zombieId].attack.add(1); 
+
+            // Increase random stats with random amount
+            uint totalGrowPoint = rarityToGrowStat[zombies[_zombieId].rarity];
+            zombies[_zombieId].combatPower = zombies[_zombieId].combatPower.add(uint32(totalGrowPoint));
+
+            uint8 loopCount = 0;
+            string[6] memory statsArray = ['healthPoint', 'attack', 'defense', 'criticalRate', 'criticalDamage', 'speed'];
+
+            while(true) {
+                loopCount = 0;
+                statsArray[0] = 'healthPoint';
+                statsArray[1] = 'attack';
+                statsArray[2] = 'defense';
+                statsArray[3] = 'criticalRate';
+                statsArray[4] = 'criticalDamage';
+                statsArray[5] = 'speed';
+
+                while(totalGrowPoint > 0) {
+                    // Check if after loop through all of the array but still has remaining grow point
+                    if(loopCount == statsArray.length) {
+                        break;
+                    }
+
+                    // Random the stat to increase and the increase amount
+                    uint randomStatNumber = randMod(statsArray.length - loopCount);
+                    string memory randomStat = statsArray[randomStatNumber];
+                    uint randomStatAmount = randMod(totalGrowPoint.add(1));
+                    
+                    // Increase stat
+                    if(keccak256(abi.encodePacked(randomStat)) == keccak256(abi.encodePacked("healthPoint"))) {
+                        zombies[_zombieId].healthPoint = zombies[_zombieId].healthPoint.add(uint32(randomStatAmount));
+                    } else if (keccak256(abi.encodePacked(randomStat)) == keccak256(abi.encodePacked("attack"))) {
+                        zombies[_zombieId].attack = zombies[_zombieId].attack.add(uint32(randomStatAmount));
+                    } else if (keccak256(abi.encodePacked(randomStat)) == keccak256(abi.encodePacked("defense"))) {
+                        zombies[_zombieId].defense = zombies[_zombieId].defense.add(uint32(randomStatAmount));
+                    } else if (keccak256(abi.encodePacked(randomStat)) == keccak256(abi.encodePacked("criticalRate"))) {
+                        zombies[_zombieId].criticalRate = zombies[_zombieId].criticalRate.add(uint32(randomStatAmount));
+                    } else if (keccak256(abi.encodePacked(randomStat)) == keccak256(abi.encodePacked("criticalDamage"))) {
+                        zombies[_zombieId].criticalDamage = zombies[_zombieId].criticalDamage.add(uint32(randomStatAmount));
+                    } else if (keccak256(abi.encodePacked(randomStat)) == keccak256(abi.encodePacked("speed"))) {
+                        zombies[_zombieId].speed = zombies[_zombieId].speed.add(uint32(randomStatAmount));
+                    }
+
+                    totalGrowPoint = totalGrowPoint.sub(randomStatAmount);
+
+                    // Remove the statsArray[randomStatNumber]
+                    // Move the last element to the deleted spot.
+                    // Remove the last element
+                    statsArray[randomStatNumber] = statsArray[statsArray.length-1];
+                    delete statsArray[statsArray.length - 1];
+
+                    loopCount++;
+                }
+
+                if(totalGrowPoint == 0) break;
+            }
         }
     }
 

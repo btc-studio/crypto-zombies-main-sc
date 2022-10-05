@@ -10,7 +10,7 @@ describe("ZombieFactory", function () {
         // Contracts are deployed using the first signer/account by default
         const [owner, addr1, addr2] = await ethers.getSigners();
 
-        const tokenContract = "0x83B5a8807FAede3De5b51a3096ac2C14d55e3cB5";
+        const tokenContract = "0xEcF3F554f58e9eF274aa3DF60f9c9ca3Ba156073";
         const ZombieFactory = await ethers.getContractFactory("ZombieAttack");
         const zombieFactory = await ZombieFactory.deploy(tokenContract);
         await zombieFactory.deployed();
@@ -50,6 +50,10 @@ describe("ZombieFactory", function () {
                 .createRandomZombie("Duong1");
 
             const zombie = await zombieFactory.connect(addr1).findBattle(0);
+            const zombies = await zombieFactory.connect(addr1).zombies(1);
+            console.log("Zombies", zombies);
+
+            await zombieFactory.connect(addr1).attack(0, 1);
         });
     });
 });
