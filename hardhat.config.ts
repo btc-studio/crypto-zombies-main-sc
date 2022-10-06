@@ -19,6 +19,7 @@ module.exports = {
         settings: {
           optimizer: {
             enabled: true,
+            runs: 200,
           },
           viaIR: true,
         }
@@ -34,14 +35,14 @@ module.exports = {
         mnemonic: process.env.MNEMONIC,
         count: 10
       },
-      saveDeployments: true
+      saveDeployments: true,
     },
     bsctest: {
       url: "https://data-seed-prebsc-1-s1.binance.org:8545",
       chainId: 97,
       accounts: [process.env.PRIV_KEY],
       gasPrice: 20000000000,
-      //blockGasLimit: 1000000
+      //blockGasLimit: 1000000,
     },
     rinkeby: {
       url: "https://eth-rinkeby.alchemyapi.io/v2/Lur41XBqJaVgjDGfXmSvYwzucY1r7ie5",
