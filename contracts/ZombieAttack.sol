@@ -17,7 +17,7 @@ contract ZombieAttack is ZombieHelper {
     }
 
     event FindBattle(uint _zombieId);
-    event FightScript(uint _zombieId, uint _targetId, FightScriptStruct[] fightScript);
+    event FightScript(uint _zombieId, uint _targetId, FightScriptStruct[] fightScripts);
     event RewardUser(uint _zombieId, uint amount, uint winnerExp, uint loserExp);
 
     constructor(address _token) ZombieHelper(_token) {}
@@ -46,45 +46,25 @@ contract ZombieAttack is ZombieHelper {
 
         uint isMyZombieTurn = 0;
         uint isEnemyZombieTurn = 0;
-        uint isCrit = 0;
 
         // -------------------------------------------------------------------
         // Count number of fighting turns -> To initiate a static array
         if (myZombie.speed >= enemyZombie.speed) {
-            if ((myZombie.attack / enemyZombie.defense + 2) * (1 + (myZombie.criticalDamage * 15 / 100 - 1) * _isCrit(myZombie.criticalRate)) >= enemyZombieCurrentHP) {
-                enemyZombieCurrentHP = 0;
-            } else {
-                enemyZombieCurrentHP = enemyZombieCurrentHP - (myZombie.attack / enemyZombie.defense + 2) * (1 + (myZombie.criticalDamage * 15 / 100 - 1) * _isCrit(myZombie.criticalRate));
-            }
-
+            enemyZombieCurrentHP = _attackByTurn(myZombie, enemyZombie, enemyZombieCurrentHP);
             isEnemyZombieTurn = 1; // Next: Enemy's Zombie turn
         } else {
-            if ((enemyZombie.attack / myZombie.defense + 2) * (1 + (enemyZombie.criticalDamage * 15 / 100 - 1) * _isCrit(enemyZombie.criticalRate)) >= myZombieCurrentHP) {
-                myZombieCurrentHP = 0;
-            } else {
-                myZombieCurrentHP = myZombieCurrentHP - (enemyZombie.attack / myZombie.defense + 2) * (1 + (enemyZombie.criticalDamage * 15 / 100 - 1) * _isCrit(enemyZombie.criticalRate));
-            }
-
+            myZombieCurrentHP = _attackByTurn(enemyZombie, myZombie, myZombieCurrentHP);
             isMyZombieTurn = 1; // Next: My Zombie turn
         }
 
         uint fightTurn = 1;
         while (myZombieCurrentHP > 0 && enemyZombieCurrentHP > 0) {
             if (isMyZombieTurn == 1) {
-                if ((myZombie.attack / enemyZombie.defense + 2) * (1 + (myZombie.criticalDamage * 15 / 100 - 1) * _isCrit(myZombie.criticalRate)) >= enemyZombieCurrentHP) {
-                    enemyZombieCurrentHP = 0;
-                } else {
-                    enemyZombieCurrentHP = enemyZombieCurrentHP - (myZombie.attack / enemyZombie.defense + 2) * (1 + (myZombie.criticalDamage * 15 / 100 - 1) * _isCrit(myZombie.criticalRate));
-                }
-
+                enemyZombieCurrentHP = _attackByTurn(myZombie, enemyZombie, enemyZombieCurrentHP);
                 isEnemyZombieTurn = 1; // Next: Enemy's Zombie turn
                 isMyZombieTurn = 0;
             } else {
-                if ((enemyZombie.attack / myZombie.defense + 2) * (1 + (enemyZombie.criticalDamage * 15 / 100 - 1) * _isCrit(enemyZombie.criticalRate)) >= myZombieCurrentHP) {
-                    myZombieCurrentHP = 0;
-                } else {
-                    myZombieCurrentHP = myZombieCurrentHP - (enemyZombie.attack / myZombie.defense + 2) * (1 + (enemyZombie.criticalDamage * 15 / 100 - 1) * _isCrit(enemyZombie.criticalRate));
-                }
+                myZombieCurrentHP = _attackByTurn(enemyZombie, myZombie, myZombieCurrentHP);
                 isMyZombieTurn = 1; // Next: My Zombie turn
                 isEnemyZombieTurn = 0;
             }
@@ -94,7 +74,7 @@ contract ZombieAttack is ZombieHelper {
         // -------------------------------------------------------------------
         // Actual fight
 
-        FightScriptStruct[] memory fightScript = new FightScriptStruct[](fightTurn);
+        FightScriptStruct[] memory fightScripts = new FightScriptStruct[](fightTurn);
 
         myZombieCurrentHP = myZombie.healthPoint;
         enemyZombieCurrentHP = enemyZombie.healthPoint;
@@ -104,38 +84,10 @@ contract ZombieAttack is ZombieHelper {
         // The zombie has more speed attack first
         // HP = HP_o -(ATK / DEF_e + 2) * (1 + (CD * 15% - 1) * (rand(CR))
         if (myZombie.speed >= enemyZombie.speed) {
-            if ((myZombie.attack / enemyZombie.defense + 2) * (1 + (myZombie.criticalDamage * 15 / 100 - 1) * _isCrit(myZombie.criticalRate)) >= enemyZombieCurrentHP) {
-                enemyZombieCurrentHP = 0;
-            } else {
-                enemyZombieCurrentHP = enemyZombieCurrentHP - (myZombie.attack / enemyZombie.defense + 2) * (1 + (myZombie.criticalDamage * 15 / 100 - 1) * _isCrit(myZombie.criticalRate));
-            }
-
-            // Update fightScript
-            isCrit = _isCrit(myZombie.criticalRate);
-            fightScript[0] = FightScriptStruct(
-                _zombieId,
-                isCrit,
-                (myZombie.attack / enemyZombie.defense + 2) * (1 + (myZombie.criticalDamage * 15 / 100 - 1) * isCrit),
-                enemyZombieCurrentHP
-            );
-
+            enemyZombieCurrentHP = _attackByTurnAndUpdateFightScripts(myZombie, enemyZombie, enemyZombieCurrentHP, fightScripts, 0);
             isEnemyZombieTurn = 1; // Next: Enemy's Zombie turn
         } else {
-            if ((enemyZombie.attack / myZombie.defense + 2) * (1 + (enemyZombie.criticalDamage * 15 / 100 - 1) * _isCrit(enemyZombie.criticalRate)) >= myZombieCurrentHP) {
-                myZombieCurrentHP = 0;
-            } else {
-                myZombieCurrentHP = myZombieCurrentHP - (enemyZombie.attack / myZombie.defense + 2) * (1 + (enemyZombie.criticalDamage * 15 / 100 - 1) * _isCrit(enemyZombie.criticalRate));
-            }
-
-            // Update fightScript
-            isCrit = _isCrit(myZombie.criticalRate);
-            fightScript[0] = FightScriptStruct(
-                _targetId,
-                isCrit,
-                (enemyZombie.attack / myZombie.defense + 2) * (1 + (enemyZombie.criticalDamage * 15 / 100 - 1) * isCrit),
-                enemyZombieCurrentHP
-            );
-
+            myZombieCurrentHP = _attackByTurnAndUpdateFightScripts(enemyZombie, myZombie, myZombieCurrentHP, fightScripts, 0);
             isMyZombieTurn = 1; // Next: My Zombie turn
         }
 
@@ -143,39 +95,11 @@ contract ZombieAttack is ZombieHelper {
         fightTurn = 1;
         while (myZombieCurrentHP > 0 && enemyZombieCurrentHP > 0) {
             if (isMyZombieTurn == 1) {
-                if ((myZombie.attack / enemyZombie.defense + 2) * (1 + (myZombie.criticalDamage * 15 / 100 - 1) * _isCrit(myZombie.criticalRate)) >= enemyZombieCurrentHP) {
-                    enemyZombieCurrentHP = 0;
-                } else {
-                    enemyZombieCurrentHP = enemyZombieCurrentHP - (myZombie.attack / enemyZombie.defense + 2) * (1 + (myZombie.criticalDamage * 15 / 100 - 1) * _isCrit(myZombie.criticalRate));
-                }
-
-                // Update fightScript
-                isCrit = _isCrit(myZombie.criticalRate);
-                fightScript[fightTurn] = FightScriptStruct(
-                    _zombieId,
-                    isCrit,
-                    (myZombie.attack / enemyZombie.defense + 2) * (1 + (myZombie.criticalDamage * 15 / 100 - 1) * isCrit),
-                    enemyZombieCurrentHP
-                );
-
+                enemyZombieCurrentHP = _attackByTurnAndUpdateFightScripts(myZombie, enemyZombie, enemyZombieCurrentHP, fightScripts, fightTurn);
                 isEnemyZombieTurn = 1; // Next: Enemy's Zombie turn
                 isMyZombieTurn = 0;
             } else {
-                if ((enemyZombie.attack / myZombie.defense + 2) * (1 + (enemyZombie.criticalDamage * 15 / 100 - 1) * _isCrit(enemyZombie.criticalRate)) >= myZombieCurrentHP) {
-                    myZombieCurrentHP = 0;
-                } else {
-                    myZombieCurrentHP = myZombieCurrentHP - (enemyZombie.attack / myZombie.defense + 2) * (1 + (enemyZombie.criticalDamage * 15 / 100 - 1) * _isCrit(enemyZombie.criticalRate));
-                }
-
-                // Update fightScript
-                isCrit = _isCrit(myZombie.criticalRate);
-                fightScript[fightTurn] = FightScriptStruct(
-                    _targetId,
-                    isCrit,
-                    (enemyZombie.attack / myZombie.defense + 2) * (1 + (enemyZombie.criticalDamage * 15 / 100 - 1) * isCrit),
-                    enemyZombieCurrentHP
-                );
-
+                myZombieCurrentHP = _attackByTurnAndUpdateFightScripts(enemyZombie, myZombie, myZombieCurrentHP, fightScripts, fightTurn);
                 isMyZombieTurn = 1; // Next: My Zombie turn
                 isEnemyZombieTurn = 0;
             }
@@ -184,7 +108,7 @@ contract ZombieAttack is ZombieHelper {
         }
 
         // Emit FightScript event
-        emit FightScript(_zombieId, _targetId, fightScript);
+        emit FightScript(_zombieId, _targetId, fightScripts);
 
         // Check who wins
         if (myZombieCurrentHP == 0) {
@@ -238,6 +162,35 @@ contract ZombieAttack is ZombieHelper {
     function calculateLoserExp(uint level) private pure returns (uint) {
         uint exp = level.sub(1).mul(5).add(12);
         return exp;
+    }
+
+    function _attackByTurn(Zombie storage attackZombie, Zombie storage defenseZombie, uint currentHP) internal returns (uint) {
+        if ((attackZombie.attack / defenseZombie.defense + 2) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * _checkCrit(attackZombie.criticalRate)) >= currentHP) {
+            currentHP = 0;
+        } else {
+            currentHP = currentHP - (attackZombie.attack / defenseZombie.defense + 2) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * _checkCrit(attackZombie.criticalRate));
+        }
+
+        return currentHP;
+    }
+
+    function _attackByTurnAndUpdateFightScripts(Zombie storage attackZombie, Zombie storage defenseZombie, uint currentHP, FightScriptStruct[] memory fightScripts, uint fightTurn) internal returns (uint) {
+        if ((attackZombie.attack / defenseZombie.defense + 2) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * _checkCrit(attackZombie.criticalRate)) >= currentHP) {
+            currentHP = 0;
+        } else {
+            currentHP = currentHP - (attackZombie.attack / defenseZombie.defense + 2) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * _checkCrit(attackZombie.criticalRate));
+        }
+
+        // Update fightScripts
+        uint isCrit = _checkCrit(attackZombie.criticalRate);
+        fightScripts[fightTurn] = FightScriptStruct(
+            attackZombie.id,
+            isCrit,
+            (attackZombie.attack / defenseZombie.defense + 2) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * isCrit),
+            currentHP
+        );
+
+        return currentHP;
     }
 
     // Update Zombie's information: exp, winCount, lossCount
