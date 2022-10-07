@@ -85,7 +85,6 @@ contract ZombieFactory is ZombieBase {
             BASE_CRIT_DAMAGE,
             BASE_SPEED,
             BASE_COMBAT_POWER,
-            ATTACK_COUNT_DEFAULT,
             BASE_RARITY,
             0
         );

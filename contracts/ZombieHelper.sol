@@ -4,6 +4,10 @@ pragma solidity ^0.8.16;
 import "./ZombieFeeding.sol";
 
 contract ZombieHelper is ZombieFeeding {
+    using SafeMath for uint256;
+    using SafeMath32 for uint32;
+    using SafeMath16 for uint16;
+
     uint levelUpFee = 0.001 ether;
 
     modifier aboveLevel(uint _level, uint _zombieId) {
@@ -74,4 +78,12 @@ contract ZombieHelper is ZombieFeeding {
     }
 
     // private method
+    function _checkCrit(uint32 _criticalRate) internal returns (uint32) {
+        uint32 randomSeed = uint32(randMod(101));
+        if(randomSeed <= _criticalRate.div(10)) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
 }

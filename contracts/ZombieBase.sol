@@ -7,7 +7,6 @@ import "hardhat/console.sol";
 uint8 constant MAX_BREEDING_POINTS = 8;
 uint8 constant LVL_CAN_BREED = 10;
 uint8 constant LVL_MAX = 20;
-uint16 constant ATTACK_COUNT_DEFAULT = 10;
 uint constant BASE_EXP = 100;
 uint constant AMOUNT_REWARD = 10;
 
@@ -37,7 +36,6 @@ contract ZombieBase is Ownable {
         uint32 criticalDamage;
         uint32 speed;
         uint32 combatPower;
-        uint16 attackCount;
         string rarity;
         uint exp;
     }
@@ -61,8 +59,7 @@ contract ZombieBase is Ownable {
         39296,
         43806,
         50944,
-        60709,
-        73211
+        60709
     ];
 
     Zombie[] public zombies;
@@ -115,7 +112,7 @@ contract ZombieBase is Ownable {
 
         // Get all possible zombies to battle (zombie not of the current owner and can attack)
         for (uint i = 0; i < zombies.length; i++) {
-            if (_owner != zombieToOwner[i] && _isCanAttack(i)) {
+            if (_owner != zombieToOwner[i]) {
                 result[counter] = i;
                 counter++;
             }
@@ -129,11 +126,6 @@ contract ZombieBase is Ownable {
         }
 
         return zombies.length;
-    }
-
-    function _isCanAttack(uint _zombieId) internal view returns (bool) {
-        Zombie memory _zombie = zombies[_zombieId];
-        return (_zombie.attackCount > 0);
     }
 
     function internalLevelUp(uint _zombieId) internal {
@@ -199,13 +191,6 @@ contract ZombieBase is Ownable {
 
                 if(totalGrowPoint == 0) break;
             }
-        }
-    }
-
-    // Reset attack count of all zombies into full
-    function resetAttackCount() external onlyOwner {
-        for (uint i = 0; i < zombies.length; i++) {
-            zombies[i].attackCount = ATTACK_COUNT_DEFAULT;
         }
     }
 }
