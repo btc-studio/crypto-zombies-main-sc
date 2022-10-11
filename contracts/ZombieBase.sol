@@ -92,9 +92,8 @@ contract ZombieBase is Ownable {
             ) % _modulus;
     }
 
-    function randomSex() internal view returns (Sex) {
-        uint rand = uint(keccak256(abi.encodePacked(block.timestamp)));
-        return Sex(rand % 2);
+    function randomSex() internal returns (Sex) {
+        return Sex(randMod(2));
     }
 
     function randomAttack() internal returns (uint) {
