@@ -2,7 +2,6 @@
 pragma solidity ^0.8.16;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "./Ownable.sol";
 import "./SafeMath.sol";
 import "./ZombieBase.sol";
 
