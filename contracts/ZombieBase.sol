@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.16;
-import "./Ownable.sol";
+import "./UserBase.sol";
 import "./SafeMath.sol";
 import "hardhat/console.sol";
 
@@ -10,7 +10,7 @@ uint8 constant LVL_MAX = 20;
 uint constant BASE_EXP = 100;
 uint constant AMOUNT_REWARD = 10;
 
-contract ZombieBase is Ownable {
+contract ZombieBase is UserBase {
     using SafeMath for uint256;
     using SafeMath32 for uint32;
     using SafeMath16 for uint16;
@@ -73,7 +73,7 @@ contract ZombieBase is Ownable {
         Female
     }
 
-    constructor(address _token) Ownable(_token) {
+    constructor(address _token) UserBase(_token) {
         rarityToGrowStat['C'] = 6;
         rarityToGrowStat['B'] = 8;
         rarityToGrowStat['A'] = 9;
