@@ -32,7 +32,7 @@ describe("ZombieFactory", function () {
                 .createRandomZombie("Duong1");
 
             const zom1 = await zombieFactory.getZombiesByOwner(addr1.address);
-            console.log(zom1);
+            // console.log(zom1);
         });
     });
 
@@ -51,9 +51,9 @@ describe("ZombieFactory", function () {
 
             const zombie = await zombieFactory.connect(addr1).findBattle(0);
             const zombies = await zombieFactory.connect(addr1).zombies(1);
-            console.log("Zombies", zombies);
+            // console.log("Zombies", zombies);
 
-            await zombieFactory.connect(addr1).attack(0, 1);
+            // await zombieFactory.connect(addr1).attack(0, 1);
         });
     });
 });
