@@ -53,6 +53,31 @@ contract ZombieFactory is ZombieBase {
         return zombies;
     }
 
+    // TODO: remove when release
+    // ABI for testing Open Stater Gift feature
+    function removeAllZombies() public {
+        uint i;
+        Zombie[] memory newZombies;
+        uint j;
+
+        for (i = 0; i < zombies.length; i += 1) {
+            Zombie memory zombie = zombies[i];
+            if (zombieToOwner[zombie.id] == msg.sender) {
+                delete zombieToOwner[zombie.id];
+                continue;
+            }
+
+            // change zombie id to j
+            zombieToOwner[j] = zombieToOwner[zombie.id];
+            zombie.id = j;
+            newZombies[j] = zombie;
+            j += 1;
+        }
+
+        ownerZombieCount[msg.sender] = 0;
+        zombies = newZombies;
+    }
+
     // internal method
     function _createZombie(string memory _name, uint _dna)
         internal

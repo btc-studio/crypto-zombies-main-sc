@@ -64,8 +64,8 @@ contract ZombieBase is UserBase {
 
     Zombie[] public zombies;
 
-    mapping(uint => address) public zombieToOwner; 
-    mapping(address => uint) ownerZombieCount;
+    mapping(uint => address) public zombieToOwner;
+    mapping(address => uint) public ownerZombieCount;
     mapping(string => uint) rarityToGrowStat; // Mapping rarity to grow stat ('A' -> 9, 'S' -> 11)
 
     enum Sex {
@@ -74,12 +74,12 @@ contract ZombieBase is UserBase {
     }
 
     constructor(address _token) UserBase(_token) {
-        rarityToGrowStat['C'] = 6;
-        rarityToGrowStat['B'] = 8;
-        rarityToGrowStat['A'] = 9;
-        rarityToGrowStat['S'] = 11;
-        rarityToGrowStat['SS'] = 15;
-        rarityToGrowStat['SSS'] = 20;
+        rarityToGrowStat["C"] = 6;
+        rarityToGrowStat["B"] = 8;
+        rarityToGrowStat["A"] = 9;
+        rarityToGrowStat["S"] = 11;
+        rarityToGrowStat["SS"] = 15;
+        rarityToGrowStat["SSS"] = 20;
     }
 
     function randMod(uint _modulus) internal returns (uint) {
@@ -137,44 +137,85 @@ contract ZombieBase is UserBase {
 
             // Increase random stats with random amount
             uint totalGrowPoint = rarityToGrowStat[zombies[_zombieId].rarity];
-            zombies[_zombieId].combatPower = zombies[_zombieId].combatPower.add(uint32(totalGrowPoint));
+            zombies[_zombieId].combatPower = zombies[_zombieId].combatPower.add(
+                uint32(totalGrowPoint)
+            );
 
             uint8 loopCount = 0;
-            string[6] memory statsArray = ['healthPoint', 'attack', 'defense', 'criticalRate', 'criticalDamage', 'speed'];
+            string[6] memory statsArray = [
+                "healthPoint",
+                "attack",
+                "defense",
+                "criticalRate",
+                "criticalDamage",
+                "speed"
+            ];
 
-            while(true) {
+            while (true) {
                 loopCount = 0;
-                statsArray[0] = 'healthPoint';
-                statsArray[1] = 'attack';
-                statsArray[2] = 'defense';
-                statsArray[3] = 'criticalRate';
-                statsArray[4] = 'criticalDamage';
-                statsArray[5] = 'speed';
+                statsArray[0] = "healthPoint";
+                statsArray[1] = "attack";
+                statsArray[2] = "defense";
+                statsArray[3] = "criticalRate";
+                statsArray[4] = "criticalDamage";
+                statsArray[5] = "speed";
 
-                while(totalGrowPoint > 0) {
+                while (totalGrowPoint > 0) {
                     // Check if after loop through all of the array but still has remaining grow point
-                    if(loopCount == statsArray.length) {
+                    if (loopCount == statsArray.length) {
                         break;
                     }
 
                     // Random the stat to increase and the increase amount
-                    uint randomStatNumber = randMod(statsArray.length - loopCount);
+                    uint randomStatNumber = randMod(
+                        statsArray.length - loopCount
+                    );
                     string memory randomStat = statsArray[randomStatNumber];
                     uint randomStatAmount = randMod(totalGrowPoint.add(1));
-                    
+
                     // Increase stat
-                    if(keccak256(abi.encodePacked(randomStat)) == keccak256(abi.encodePacked("healthPoint"))) {
-                        zombies[_zombieId].healthPoint = zombies[_zombieId].healthPoint.add(uint32(randomStatAmount));
-                    } else if (keccak256(abi.encodePacked(randomStat)) == keccak256(abi.encodePacked("attack"))) {
-                        zombies[_zombieId].attack = zombies[_zombieId].attack.add(uint32(randomStatAmount));
-                    } else if (keccak256(abi.encodePacked(randomStat)) == keccak256(abi.encodePacked("defense"))) {
-                        zombies[_zombieId].defense = zombies[_zombieId].defense.add(uint32(randomStatAmount));
-                    } else if (keccak256(abi.encodePacked(randomStat)) == keccak256(abi.encodePacked("criticalRate"))) {
-                        zombies[_zombieId].criticalRate = zombies[_zombieId].criticalRate.add(uint32(randomStatAmount));
-                    } else if (keccak256(abi.encodePacked(randomStat)) == keccak256(abi.encodePacked("criticalDamage"))) {
-                        zombies[_zombieId].criticalDamage = zombies[_zombieId].criticalDamage.add(uint32(randomStatAmount));
-                    } else if (keccak256(abi.encodePacked(randomStat)) == keccak256(abi.encodePacked("speed"))) {
-                        zombies[_zombieId].speed = zombies[_zombieId].speed.add(uint32(randomStatAmount));
+                    if (
+                        keccak256(abi.encodePacked(randomStat)) ==
+                        keccak256(abi.encodePacked("healthPoint"))
+                    ) {
+                        zombies[_zombieId].healthPoint = zombies[_zombieId]
+                            .healthPoint
+                            .add(uint32(randomStatAmount));
+                    } else if (
+                        keccak256(abi.encodePacked(randomStat)) ==
+                        keccak256(abi.encodePacked("attack"))
+                    ) {
+                        zombies[_zombieId].attack = zombies[_zombieId]
+                            .attack
+                            .add(uint32(randomStatAmount));
+                    } else if (
+                        keccak256(abi.encodePacked(randomStat)) ==
+                        keccak256(abi.encodePacked("defense"))
+                    ) {
+                        zombies[_zombieId].defense = zombies[_zombieId]
+                            .defense
+                            .add(uint32(randomStatAmount));
+                    } else if (
+                        keccak256(abi.encodePacked(randomStat)) ==
+                        keccak256(abi.encodePacked("criticalRate"))
+                    ) {
+                        zombies[_zombieId].criticalRate = zombies[_zombieId]
+                            .criticalRate
+                            .add(uint32(randomStatAmount));
+                    } else if (
+                        keccak256(abi.encodePacked(randomStat)) ==
+                        keccak256(abi.encodePacked("criticalDamage"))
+                    ) {
+                        zombies[_zombieId].criticalDamage = zombies[_zombieId]
+                            .criticalDamage
+                            .add(uint32(randomStatAmount));
+                    } else if (
+                        keccak256(abi.encodePacked(randomStat)) ==
+                        keccak256(abi.encodePacked("speed"))
+                    ) {
+                        zombies[_zombieId].speed = zombies[_zombieId].speed.add(
+                            uint32(randomStatAmount)
+                        );
                     }
 
                     totalGrowPoint = totalGrowPoint.sub(randomStatAmount);
@@ -182,13 +223,15 @@ contract ZombieBase is UserBase {
                     // Remove the statsArray[randomStatNumber]
                     // Move the last element to the deleted spot.
                     // Remove the last element
-                    statsArray[randomStatNumber] = statsArray[statsArray.length-1];
+                    statsArray[randomStatNumber] = statsArray[
+                        statsArray.length - 1
+                    ];
                     delete statsArray[statsArray.length - 1];
 
                     loopCount++;
                 }
 
-                if(totalGrowPoint == 0) break;
+                if (totalGrowPoint == 0) break;
             }
         }
     }
