@@ -36,7 +36,7 @@ contract ZombieAttack is ZombieHelper {
         external
         onlyOwnerOf(_zombieId)
     {
-        address _userAddress = zombieToOwner[_zombieId];
+        // address _userAddress = zombieToOwner[_zombieId];
         Zombie storage myZombie = zombies[_zombieId];
         Zombie storage enemyZombie = zombies[_targetId];
 
@@ -142,12 +142,12 @@ contract ZombieAttack is ZombieHelper {
             _updateZombie(enemyZombie, myZombie, winnerExp, loserExp);
 
             // Update user's experience
-            _updateUserExp(_userAddress, loserExp);
+            // _updateUserExp(_userAddress, loserExp);
         } else {
             _updateZombie(myZombie, enemyZombie, winnerExp, loserExp);
 
             // Update user's experience
-            _updateUserExp(_userAddress, winnerExp);
+            // _updateUserExp(_userAddress, winnerExp);
         }
 
         // Reward BTCS Token if the Smart Contract has enough BTCS

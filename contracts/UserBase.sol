@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.16;
+
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./Ownable.sol";
 import "./SafeMath.sol";
@@ -13,6 +14,13 @@ contract UserBase is Ownable {
     uint8 constant USER_START_LEVEL = 1;
     uint8 constant USER_START_EXP = 0;
     uint8 constant USER_MAX_LEVEL_CAP = 20;
+
+    struct User {
+        string name;
+        uint8 level;
+        uint256 exp;
+    }
+
     uint32[] USER_EXP_TO_LEVEL_UP = [
         8,
         280,
@@ -32,16 +40,10 @@ contract UserBase is Ownable {
         39296,
         43806,
         50944,
-        60709,
-        73211
+        60709
     ];
-    User[] public users;
 
-    struct User {
-        string name;
-        uint8 level;
-        uint256 exp;
-    }
+    User[] public users;
 
     mapping(address => User) ownerInfos;
 
@@ -80,11 +82,10 @@ contract UserBase is Ownable {
         bool isUserLevelUp = false;
         uint8 userCurrentLevel = _user.level;
         uint8 userNextLevel = _user.level;
-
         // Add exp to the current user
         _user.exp = _user.exp.add(_exp);
-
         // Update user current level if exp is bypassing the next level cap.
+
         while (
             _user.level < USER_MAX_LEVEL_CAP &&
             _user.exp >= USER_EXP_TO_LEVEL_UP[_user.level - 1]
@@ -93,7 +94,6 @@ contract UserBase is Ownable {
             isUserLevelUp = true;
             userNextLevel = _user.level;
         }
-
         if (isUserLevelUp) {
             emit UserLevelUp(_userAddress, userCurrentLevel, userNextLevel);
         }
