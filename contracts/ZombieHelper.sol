@@ -79,8 +79,8 @@ contract ZombieHelper is ZombieFeeding {
 
     // private method
     function _checkCrit(uint32 _criticalRate) internal returns (uint32) {
-        uint32 randomSeed = uint32(randMod(101));
-        if(randomSeed <= _criticalRate.div(10)) {
+        uint32 randomSeed = uint32(randMod(10001));
+        if(randomSeed <= _criticalRate.mul(100).div(10)) {
             return 1;
         } else {
             return 0;
