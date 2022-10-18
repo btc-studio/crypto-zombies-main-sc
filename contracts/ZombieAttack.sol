@@ -42,8 +42,8 @@ contract ZombieAttack is ZombieHelper {
 
         uint winnerZombieId = _targetId;
 
-        uint myZombieCurrentHP = myZombie.healthPoint;
-        uint enemyZombieCurrentHP = enemyZombie.healthPoint;
+        uint myZombieCurrentHP = myZombie.healthPoint.mul(100);
+        uint enemyZombieCurrentHP = enemyZombie.healthPoint.mul(100);
 
         uint isMyZombieTurn = 0;
         uint isEnemyZombieTurn = 0;
@@ -77,14 +77,14 @@ contract ZombieAttack is ZombieHelper {
 
         FightScriptStruct[] memory fightScripts = new FightScriptStruct[](fightTurn);
 
-        myZombieCurrentHP = myZombie.healthPoint;
-        enemyZombieCurrentHP = enemyZombie.healthPoint;
+        myZombieCurrentHP = myZombie.healthPoint.mul(100);
+        enemyZombieCurrentHP = enemyZombie.healthPoint.mul(100);
         FightScriptStruct memory fightScript;
 
         isMyZombieTurn = 0;
         isEnemyZombieTurn = 0;
         // The zombie has more speed attack first
-        // HP = HP_o -(ATK / DEF_e + 2) * (1 + (CD * 15% - 1) * (rand(CR))
+        // HP = HP_o*100 -(100*ATK / DEF_e + 200) * (100 + 100*(CD * 15% - 1) * (rand(CR))
         if (myZombie.speed >= enemyZombie.speed) {
             (enemyZombieCurrentHP, fightScript) = _attackByTurnAndUpdateFightScripts(myZombie, enemyZombie, enemyZombieCurrentHP);
             fightScripts[0] = fightScript;
@@ -177,28 +177,28 @@ contract ZombieAttack is ZombieHelper {
     }
 
     function _attackByTurn(Zombie storage attackZombie, Zombie storage defenseZombie, uint currentHP) internal returns (uint) {
-        if ((attackZombie.attack / defenseZombie.defense + 2) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * _checkCrit(attackZombie.criticalRate)) >= currentHP) {
+        if ((100 * attackZombie.attack / defenseZombie.defense + 200) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * _checkCrit(attackZombie.criticalRate)) >= currentHP) {
             currentHP = 0;
         } else {
-            currentHP = currentHP - (attackZombie.attack / defenseZombie.defense + 2) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * _checkCrit(attackZombie.criticalRate));
+            currentHP = currentHP - (100 * attackZombie.attack / defenseZombie.defense + 200) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * _checkCrit(attackZombie.criticalRate));
         }
 
         return currentHP;
     }
 
     function _attackByTurnAndUpdateFightScripts(Zombie storage attackZombie, Zombie storage defenseZombie, uint currentHP) internal returns (uint, FightScriptStruct memory) {
-        if ((attackZombie.attack / defenseZombie.defense + 2) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * _checkCrit(attackZombie.criticalRate)) >= currentHP) {
+        uint isCrit = _checkCrit(attackZombie.criticalRate);
+        if ((100 * attackZombie.attack / defenseZombie.defense + 200) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * isCrit) >= currentHP) {
             currentHP = 0;
         } else {
-            currentHP = currentHP - (attackZombie.attack / defenseZombie.defense + 2) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * _checkCrit(attackZombie.criticalRate));
+            currentHP = currentHP - (100 * attackZombie.attack / defenseZombie.defense + 200) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * isCrit);
         }
 
         // Update fightScripts
-        uint isCrit = _checkCrit(attackZombie.criticalRate);
         FightScriptStruct memory fightScript = FightScriptStruct(
             attackZombie.id,
             isCrit,
-            (attackZombie.attack / defenseZombie.defense + 2) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * isCrit),
+            (100 * attackZombie.attack / defenseZombie.defense + 200) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * isCrit),
             currentHP
         );
 

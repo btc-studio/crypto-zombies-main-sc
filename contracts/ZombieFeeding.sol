@@ -127,8 +127,13 @@ contract ZombieFeeding is ZombieFactory {
         onlyOwnerOf(_zombieId)
     {
         Zombie storage zombie = zombies[_zombieId];
+
+        // Update zombie level
         if (level >= LVL_MAX) level = LVL_MAX;
         zombie.level = level;
+
+        // Update zombie exp
+        zombie.exp = EXP_UP_LEVEL[level - 2];
     }
 
     // For testing
@@ -138,6 +143,36 @@ contract ZombieFeeding is ZombieFactory {
     {
         Zombie storage zombie = zombies[_zombieId];
         zombie.sex = sex;
+    }
+
+    function setRarityZombie(uint _zombieId, string memory rarity) public {
+        Zombie storage zombie = zombies[_zombieId];
+        zombie.rarity = rarity;
+    }
+
+    function setStatZombie(
+        uint _zombieId,
+        uint32 healthPoint,
+        uint32 attack,
+        uint32 defense,
+        uint32 criticalRate,
+        uint32 criticalDamage,
+        uint32 speed,
+        uint32 combatPower
+    ) public {
+        Zombie storage zombie = zombies[_zombieId];
+        zombie.healthPoint = healthPoint;
+        zombie.attack = attack;
+        zombie.defense = defense;
+        zombie.criticalRate = criticalRate;
+        zombie.criticalDamage = criticalDamage;
+        zombie.speed = speed;
+        zombie.combatPower = combatPower;
+    }
+
+    function setName(uint _zombieId, string memory _name) public {
+        Zombie storage zombie = zombies[_zombieId];
+        zombie.name = _name;
     }
     /// -------------------------------------------------
 }
