@@ -3,6 +3,7 @@
 ## Useful Links
 
 ---
+
 1. [Crypto Zombies Domain](http://dev.crypto-zombie.ai-studio-work.net/)
 2. [Crypto Zombies Repository](https://github.com/btc-studio/crypto-zombies-main-sc)
 
@@ -31,7 +32,7 @@ A solidity smart contract for the Ethereum based zombie game.
 
 1. ### [Download Metamask](https://metamask.io/)
 
-2. ### [How to get BNB Testnet faucet](https://btc-studio.larksuite.com/wiki/wikusFiRaJa6cfEcDf9EqBnERWy#doxusUiCGCekoGECUiEFRcxfmsg) to sign contract transactions 
+2. ### [How to get BNB Testnet faucet](https://btc-studio.larksuite.com/wiki/wikusFiRaJa6cfEcDf9EqBnERWy#doxusUiCGCekoGECUiEFRcxfmsg) to sign contract transactions
 
 3. ### Import BTCS Token into Metamask
 
@@ -123,13 +124,20 @@ yarn compile
 yarn deploy bsctest
 ```
 
-### Verify
+### Verify CryptoZombie Contract
 
 ```shell
-yarn verify bsctest <SMART_CONTRACT_ADDRESS> <TOKEN_CONTRACT_ADDRESS>
+yarn verify bsctest <CRYPTO_ZOMBIE_SMART_CONTRACT_ADDRESS> <TOKEN_CONTRACT_ADDRESS>
+```
+
+### Verify NFT Marketplace Contract
+
+```shell
+yarn verify bsctest <MARKETPLACE_SMART_CONTRACT_ADDRESS> <MARKET_FEE>
 ```
 
 ## Network
+
 ---
 
 development

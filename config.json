@@ -1,10 +1,10 @@
 {
   "dev": {},
   "bsctest": {
-    "btcs": "0xd6354206EfcB43e9619ac723dA1FA0D59f11A391"
+    "cryptoZombie": "0x7d728ce3062D5B7fC2877bf20DeBBFce36Bb25Dd",
+    "marketplace": "0xbA3a9Be97a67e9504980066e6482a6b60A4392d7",
+    "btcs": "0xEcF3F554f58e9eF274aa3DF60f9c9ca3Ba156073"
   },
-  "rinkeby": {
-    "btcs": "0x41De94ecB62A30833a28F74bA31299f62376C789"
-  },
+  "rinkeby": {},
   "main": {}
 }

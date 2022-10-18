@@ -2,13 +2,12 @@
 pragma solidity ^0.8.16;
 
 import "./ZombieAttack.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./SafeMath.sol";
 
 /// @title A contract to make zombie tradable
 /// @author Shishir Sonekar
 /// @notice It follows all the necessary operations of ECR721 Standard
-abstract contract ZombieOwnership is ZombieAttack, ERC721 {
+abstract contract ZombieOwnership is ZombieAttack {
     using SafeMath for uint256;
 
     mapping(uint => address) zombieApprovals;

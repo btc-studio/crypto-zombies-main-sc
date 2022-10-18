@@ -2,13 +2,17 @@
 pragma solidity ^0.8.16;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "./Ownable.sol";
 import "./SafeMath.sol";
 import "./ZombieBase.sol";
 
-contract ZombieFactory is ZombieBase {
+contract ZombieFactory is ZombieBase, ERC721 {
     using SafeMath for uint256;
     using SafeMath32 for uint32;
     using SafeMath16 for uint16;
+
+    uint public tokenCount;
 
     uint8 public constant BASE_HEALTH_POINT = 10;
     uint8 public constant BASE_ATTACK = 10;
@@ -29,7 +33,10 @@ contract ZombieFactory is ZombieBase {
         uint32 level
     );
 
-    constructor(address _token) ZombieBase(_token) {}
+    constructor(address _token)
+        ZombieBase(_token)
+        ERC721("CryptoZombieNFT", "CZB")
+    {}
 
     // external method: order view -> pure
 
@@ -58,8 +65,9 @@ contract ZombieFactory is ZombieBase {
         internal
         returns (Zombie memory)
     {
+        tokenCount++;
         Sex sex = randomSex();
-        uint id = zombies.length;
+        uint id = tokenCount;
         string memory _realName = _name;
 
         // If zombie's name is null then set name = BASE_NAME + id
@@ -91,6 +99,8 @@ contract ZombieFactory is ZombieBase {
         zombies.push(zombie);
         zombieToOwner[id] = msg.sender;
         ownerZombieCount[msg.sender] = ownerZombieCount[msg.sender].add(1);
+
+        _safeMint(msg.sender, tokenCount);
         emit NewZombie(msg.sender, id, _name, _dna, sex, 1);
 
         return zombie;
