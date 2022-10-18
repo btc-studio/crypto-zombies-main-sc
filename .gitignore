@@ -38,8 +38,4 @@ typechain-types
 cache
 artifacts
 
-<<<<<<< HEAD
 contracts/BTCS
-=======
-contracts/BTCS
->>>>>>> e565278... Add NFT Marketplace
