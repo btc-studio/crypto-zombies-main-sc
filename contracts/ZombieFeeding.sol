@@ -66,7 +66,7 @@ contract ZombieFeeding is ZombieFactory {
         uint _targetDna,
         string memory _species
     ) internal onlyOwnerOf(_zombieId) {
-        Zombie storage myZombie = zombies[_zombieId];
+        Zombie storage myZombie = zombies[_zombieId - 1];
         require(_isReady(myZombie));
         _targetDna = _targetDna % dnaModulus;
         uint newDna = (myZombie.dna + _targetDna) / 2;
@@ -103,8 +103,8 @@ contract ZombieFeeding is ZombieFactory {
         uint _motherId,
         string memory _name
     ) public onlyOwnerOf(_fatherId) onlyOwnerOf(_motherId) {
-        Zombie storage father = zombies[_fatherId];
-        Zombie storage mother = zombies[_motherId];
+        Zombie storage father = zombies[_fatherId - 1];
+        Zombie storage mother = zombies[_motherId - 1];
 
         // Kiểm tra điều kiện
         require(_isCanBreed(father));
@@ -126,7 +126,7 @@ contract ZombieFeeding is ZombieFactory {
         public
         onlyOwnerOf(_zombieId)
     {
-        Zombie storage zombie = zombies[_zombieId];
+        Zombie storage zombie = zombies[_zombieId - 1];
 
         // Update zombie level
         if (level >= LVL_MAX) level = LVL_MAX;
@@ -141,12 +141,12 @@ contract ZombieFeeding is ZombieFactory {
         public
         onlyOwnerOf(_zombieId)
     {
-        Zombie storage zombie = zombies[_zombieId];
+        Zombie storage zombie = zombies[_zombieId - 1];
         zombie.sex = sex;
     }
 
     function setRarityZombie(uint _zombieId, string memory rarity) public {
-        Zombie storage zombie = zombies[_zombieId];
+        Zombie storage zombie = zombies[_zombieId - 1];
         zombie.rarity = rarity;
     }
 
@@ -160,7 +160,7 @@ contract ZombieFeeding is ZombieFactory {
         uint32 speed,
         uint32 combatPower
     ) public {
-        Zombie storage zombie = zombies[_zombieId];
+        Zombie storage zombie = zombies[_zombieId - 1];
         zombie.healthPoint = healthPoint;
         zombie.attack = attack;
         zombie.defense = defense;
@@ -171,7 +171,7 @@ contract ZombieFeeding is ZombieFactory {
     }
 
     function setName(uint _zombieId, string memory _name) public {
-        Zombie storage zombie = zombies[_zombieId];
+        Zombie storage zombie = zombies[_zombieId - 1];
         zombie.name = _name;
     }
     /// -------------------------------------------------

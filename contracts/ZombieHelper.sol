@@ -11,7 +11,7 @@ contract ZombieHelper is ZombieFeeding {
     uint levelUpFee = 0.001 ether;
 
     modifier aboveLevel(uint _level, uint _zombieId) {
-        require(zombies[_zombieId].level >= _level);
+        require(zombies[_zombieId - 1].level >= _level);
         _;
     }
 
@@ -28,7 +28,7 @@ contract ZombieHelper is ZombieFeeding {
 
     function levelUp(uint _zombieId) external payable {
         require(msg.value == levelUpFee);
-        zombies[_zombieId].level++;
+        zombies[_zombieId - 1].level++;
     }
 
     function changeName(uint _zombieId, string memory _newName)
@@ -36,7 +36,7 @@ contract ZombieHelper is ZombieFeeding {
         aboveLevel(2, _zombieId)
         onlyOwnerOf(_zombieId)
     {
-        zombies[_zombieId].name = _newName;
+        zombies[_zombieId - 1].name = _newName;
     }
 
     function changeDna(uint _zombieId, uint _newDna)
@@ -44,7 +44,7 @@ contract ZombieHelper is ZombieFeeding {
         aboveLevel(20, _zombieId)
         onlyOwnerOf(_zombieId)
     {
-        zombies[_zombieId].dna = _newDna;
+        zombies[_zombieId - 1].dna = _newDna;
     }
 
     function getZombiesByOwner(address _owner)

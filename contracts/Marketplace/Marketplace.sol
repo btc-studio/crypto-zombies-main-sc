@@ -101,7 +101,11 @@ contract Marketplace is ReentrancyGuard {
         // Pay seller and feeAccount
         // Accept BTCS token to purchase NFTs
         item.ft.transferFrom(msg.sender, item.seller, item.price);
-        item.ft.transferFrom(msg.sender, receivedFeeAccount, _totalPrice - item.price);
+        item.ft.transferFrom(
+            msg.sender,
+            receivedFeeAccount,
+            _totalPrice - item.price
+        );
 
         // Update item to sold
         item.sold = true;
