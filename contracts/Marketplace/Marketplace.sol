@@ -30,6 +30,8 @@ contract Marketplace is ReentrancyGuard {
         address indexed seller
     );
 
+    event Unoffered(uint itemId, address indexed nft, uint tokenId);
+
     event Bought(
         uint itemId,
         address indexed nft,
@@ -83,6 +85,22 @@ contract Marketplace is ReentrancyGuard {
             _price,
             msg.sender
         );
+    }
+
+    function unmakeItem(IERC721 _nft, uint _itemId) external nonReentrant {
+        Item storage item = items[_itemId];
+        require(
+            msg.sender == item.seller,
+            "Only owner of the NFT can remove item from Marketplace"
+        );
+
+        // Transfer nft
+        _nft.transferFrom(address(this), msg.sender, item.tokenId);
+
+        // Remove _itemId from items mapping
+        delete items[_itemId];
+        // Emit Offered event
+        emit Unoffered(_itemId, address(_nft), item.tokenId);
     }
 
     /// @notice Buy an NFT on the Marketplace

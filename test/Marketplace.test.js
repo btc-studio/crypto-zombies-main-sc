@@ -33,8 +33,8 @@ describe("NFTMarketplace", function () {
       expect(await nft.symbol()).to.equal("CZB");
     });
     it("Should track feeAccount and feePercent of the nft collection", async function () {
-      expect(await marketplace.feeAccount()).to.equal(deployer.address);
-      expect(await marketplace.feePercent()).to.equal(feePercent);
+      expect(await marketplace.receivedFeeAccount()).to.equal(deployer.address);
+      expect(await marketplace.feePercentOnSales()).to.equal(feePercent);
     });
   });
 
@@ -89,6 +89,38 @@ describe("NFTMarketplace", function () {
       await expect(
         marketplace.connect(addr1).makeItem(nft.address, ft.address, 1, 0)
       ).to.be.revertedWith("Price must be greater than zero");
+    });
+  });
+
+  describe("Remove items from marketplace", function () {
+    beforeEach(async function () {
+      // addr1 mints an nft
+      await nft.connect(addr1).createRandomZombie(zombieName);
+      // addr1 approve marketplace to spend nft
+      await nft.connect(addr1).setApprovalForAll(marketplace.address, true);
+      // addr1 makes their nft a marketplace item
+      await marketplace
+        .connect(addr1)
+        .makeItem(nft.address, ft.address, 1, toWei(2));
+    });
+
+    it("Should remove item from Marketplace, transfer ownership back to seller", async function () {
+      // NFT with tokenId = 1 is currently listed on Marketplace -> Owner should be the Marketplace
+      expect(await nft.ownerOf(1)).to.equal(marketplace.address);
+
+      // Remove tokenId = 1 (ứng với itemId = 1) from Marketplace on behalf of addr2 (not the former owner)
+      // Should revert
+      await expect(
+        marketplace.connect(addr2).unmakeItem(nft.address, 1)
+      ).to.be.revertedWith(
+        "Only owner of the NFT can remove item from Marketplace"
+      );
+
+      // Remove tokenId = 1 (ứng với itemId = 1) from Marketplace on behalf of addr1 (the former owner)
+      await marketplace.connect(addr1).unmakeItem(nft.address, 1);
+      // Now the owner of the NFT with tokenId = 1 should be addr1
+      expect(await nft.ownerOf(1)).to.equal(addr1.address);
+
     });
   });
 
