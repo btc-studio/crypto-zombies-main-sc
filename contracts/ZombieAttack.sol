@@ -37,8 +37,8 @@ contract ZombieAttack is ZombieHelper {
         onlyOwnerOf(_zombieId)
     {
         // address _userAddress = zombieToOwner[_zombieId];
-        Zombie storage myZombie = zombies[_zombieId];
-        Zombie storage enemyZombie = zombies[_targetId];
+        Zombie storage myZombie = zombies[_zombieId - 1];
+        Zombie storage enemyZombie = zombies[_targetId - 1];
 
         uint winnerZombieId = _targetId;
 
