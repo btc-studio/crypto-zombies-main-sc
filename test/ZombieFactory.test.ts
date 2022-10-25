@@ -53,7 +53,7 @@ describe('ZombieFactory', function () {
         .connect(addr2)
         .createRandomZombie('Duong1');
 
-      const zombie = await zombieFactory.connect(addr1).findBattle(0);
+      const zombie = await zombieFactory.connect(addr1).findBattle(1);
       const zombies = await zombieFactory.connect(addr1).zombies(1);
       // console.log("Zombies", zombies);
 
