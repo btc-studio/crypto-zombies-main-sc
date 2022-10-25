@@ -24,19 +24,14 @@ describe('ZombieFactory', function () {
         deployOneYearLockFixture
       );
 
-      console.log('1');
       const zombie1 = await zombieFactory
         .connect(addr1)
         .createRandomZombie('Duong');
-      console.log('2');
       const zombie2 = await zombieFactory
         .connect(addr2)
         .createRandomZombie('Duong1');
-      console.log('3');
 
       const zom1 = await zombieFactory.getZombiesByOwner(addr1.address);
-      console.log('4');
-      // console.log(zom1);
     });
   });
 
@@ -55,9 +50,6 @@ describe('ZombieFactory', function () {
 
       const zombie = await zombieFactory.connect(addr1).findBattle(1);
       const zombies = await zombieFactory.connect(addr1).zombies(1);
-      // console.log("Zombies", zombies);
-
-      // await zombieFactory.connect(addr1).attack(0, 1);
     });
   });
 });
