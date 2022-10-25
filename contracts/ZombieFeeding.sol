@@ -30,7 +30,7 @@ contract ZombieFeeding is ZombieFactory {
     using SafeMath16 for uint16;
 
     modifier onlyOwnerOf(uint _zombieId) {
-        require(msg.sender == zombieToOwner[_zombieId]);
+        require(msg.sender == ownerOf(_zombieId));
         _;
     }
 

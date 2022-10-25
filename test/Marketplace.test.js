@@ -29,7 +29,7 @@ describe("NFTMarketplace", function () {
   });
   describe("Deployment", function () {
     it("Should track name and symbol of the nft collection", async function () {
-      expect(await nft.name()).to.equal("CryptoZombieNFT");
+      expect(await nft.name()).to.equal("BTCZombieNFT");
       expect(await nft.symbol()).to.equal("CZB");
     });
     it("Should track feeAccount and feePercent of the nft collection", async function () {
