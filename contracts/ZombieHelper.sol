@@ -52,10 +52,10 @@ contract ZombieHelper is ZombieFeeding {
         view
         returns (uint[] memory)
     {
-        uint[] memory result = new uint[](ownerZombieCount[_owner]);
+        uint[] memory result = new uint[](_getNumberZombiesOfOwner(_owner));
         uint counter = 0;
-        for (uint i = 0; i < zombies.length; i++) {
-            if (zombieToOwner[i] == _owner) {
+        for (uint i = 0; i < zombies.length; i += 1) {
+            if (ownerOf(zombies[i].id) == _owner) {
                 result[counter] = i;
                 counter++;
             }
@@ -65,7 +65,7 @@ contract ZombieHelper is ZombieFeeding {
 
     // public method
     function _isNotOnlyOwner() public view returns (bool) {
-        return ownerZombieCount[msg.sender] != zombies.length;
+        return _getNumberZombiesOfOwner(msg.sender) != zombies.length;
     }
 
     // internal method
@@ -74,13 +74,21 @@ contract ZombieHelper is ZombieFeeding {
         view
         returns (uint)
     {
-        return ownerZombieCount[_owner];
+        uint count = 0;
+
+        for (uint index = 0; index < zombies.length; index += 1) {
+            if (_owner == ownerOf(zombies[index].id)) {
+                count += 1;
+            }
+        }
+
+        return count;
     }
 
     // private method
     function _checkCrit(uint32 _criticalRate) internal returns (uint32) {
         uint32 randomSeed = uint32(randMod(10001));
-        if(randomSeed <= _criticalRate.mul(100).div(10)) {
+        if (randomSeed <= _criticalRate.mul(100).div(10)) {
             return 1;
         } else {
             return 0;

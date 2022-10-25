@@ -17,8 +17,17 @@ contract ZombieAttack is ZombieHelper {
     }
 
     event FindBattle(uint _zombieId);
-    event FightScript(uint _zombieId, uint _targetId, FightScriptStruct[] fightScripts);
-    event RewardUser(uint _zombieId, uint amount, uint winnerExp, uint loserExp);
+    event FightScript(
+        uint _zombieId,
+        uint _targetId,
+        FightScriptStruct[] fightScripts
+    );
+    event RewardUser(
+        uint _zombieId,
+        uint amount,
+        uint winnerExp,
+        uint loserExp
+    );
 
     constructor(address _token) ZombieHelper(_token) {}
 
@@ -36,7 +45,6 @@ contract ZombieAttack is ZombieHelper {
         external
         onlyOwnerOf(_zombieId)
     {
-        // address _userAddress = zombieToOwner[_zombieId];
         Zombie storage myZombie = zombies[_zombieId - 1];
         Zombie storage enemyZombie = zombies[_targetId - 1];
 
@@ -51,21 +59,37 @@ contract ZombieAttack is ZombieHelper {
         // -------------------------------------------------------------------
         // Count number of fighting turns -> To initiate a static array
         if (myZombie.speed >= enemyZombie.speed) {
-            enemyZombieCurrentHP = _attackByTurn(myZombie, enemyZombie, enemyZombieCurrentHP);
+            enemyZombieCurrentHP = _attackByTurn(
+                myZombie,
+                enemyZombie,
+                enemyZombieCurrentHP
+            );
             isEnemyZombieTurn = 1; // Next: Enemy's Zombie turn
         } else {
-            myZombieCurrentHP = _attackByTurn(enemyZombie, myZombie, myZombieCurrentHP);
+            myZombieCurrentHP = _attackByTurn(
+                enemyZombie,
+                myZombie,
+                myZombieCurrentHP
+            );
             isMyZombieTurn = 1; // Next: My Zombie turn
         }
 
         uint fightTurn = 1;
         while (myZombieCurrentHP > 0 && enemyZombieCurrentHP > 0) {
             if (isMyZombieTurn == 1) {
-                enemyZombieCurrentHP = _attackByTurn(myZombie, enemyZombie, enemyZombieCurrentHP);
+                enemyZombieCurrentHP = _attackByTurn(
+                    myZombie,
+                    enemyZombie,
+                    enemyZombieCurrentHP
+                );
                 isEnemyZombieTurn = 1; // Next: Enemy's Zombie turn
                 isMyZombieTurn = 0;
             } else {
-                myZombieCurrentHP = _attackByTurn(enemyZombie, myZombie, myZombieCurrentHP);
+                myZombieCurrentHP = _attackByTurn(
+                    enemyZombie,
+                    myZombie,
+                    myZombieCurrentHP
+                );
                 isMyZombieTurn = 1; // Next: My Zombie turn
                 isEnemyZombieTurn = 0;
             }
@@ -75,7 +99,9 @@ contract ZombieAttack is ZombieHelper {
         // -------------------------------------------------------------------
         // Actual fight
 
-        FightScriptStruct[] memory fightScripts = new FightScriptStruct[](fightTurn);
+        FightScriptStruct[] memory fightScripts = new FightScriptStruct[](
+            fightTurn
+        );
 
         myZombieCurrentHP = myZombie.healthPoint.mul(100);
         enemyZombieCurrentHP = enemyZombie.healthPoint.mul(100);
@@ -86,11 +112,25 @@ contract ZombieAttack is ZombieHelper {
         // The zombie has more speed attack first
         // HP = HP_o*100 -(100*ATK / DEF_e + 200) * (100 + 100*(CD * 15% - 1) * (rand(CR))
         if (myZombie.speed >= enemyZombie.speed) {
-            (enemyZombieCurrentHP, fightScript) = _attackByTurnAndUpdateFightScripts(myZombie, enemyZombie, enemyZombieCurrentHP);
+            (
+                enemyZombieCurrentHP,
+                fightScript
+            ) = _attackByTurnAndUpdateFightScripts(
+                myZombie,
+                enemyZombie,
+                enemyZombieCurrentHP
+            );
             fightScripts[0] = fightScript;
             isEnemyZombieTurn = 1; // Next: Enemy's Zombie turn
         } else {
-            (myZombieCurrentHP, fightScript) = _attackByTurnAndUpdateFightScripts(enemyZombie, myZombie, myZombieCurrentHP);
+            (
+                myZombieCurrentHP,
+                fightScript
+            ) = _attackByTurnAndUpdateFightScripts(
+                enemyZombie,
+                myZombie,
+                myZombieCurrentHP
+            );
             fightScripts[0] = fightScript;
             isMyZombieTurn = 1; // Next: My Zombie turn
         }
@@ -99,12 +139,26 @@ contract ZombieAttack is ZombieHelper {
         fightTurn = 1;
         while (myZombieCurrentHP > 0 && enemyZombieCurrentHP > 0) {
             if (isMyZombieTurn == 1) {
-                (enemyZombieCurrentHP, fightScript) = _attackByTurnAndUpdateFightScripts(myZombie, enemyZombie, enemyZombieCurrentHP);
+                (
+                    enemyZombieCurrentHP,
+                    fightScript
+                ) = _attackByTurnAndUpdateFightScripts(
+                    myZombie,
+                    enemyZombie,
+                    enemyZombieCurrentHP
+                );
                 fightScripts[fightTurn] = fightScript;
                 isEnemyZombieTurn = 1; // Next: Enemy's Zombie turn
                 isMyZombieTurn = 0;
             } else {
-                (myZombieCurrentHP, fightScript) = _attackByTurnAndUpdateFightScripts(enemyZombie, myZombie, myZombieCurrentHP);
+                (
+                    myZombieCurrentHP,
+                    fightScript
+                ) = _attackByTurnAndUpdateFightScripts(
+                    enemyZombie,
+                    myZombie,
+                    myZombieCurrentHP
+                );
                 fightScripts[fightTurn] = fightScript;
                 isMyZombieTurn = 1; // Next: My Zombie turn
                 isEnemyZombieTurn = 0;
@@ -152,10 +206,7 @@ contract ZombieAttack is ZombieHelper {
 
         // Reward BTCS Token if the Smart Contract has enough BTCS
         // TODO: Need a mechanism to ensure the reward for user when SC is out of BTCS Token
-        sendReward(
-            zombieToOwner[winnerZombieId],
-            AMOUNT_REWARD * 10**uint256(18)
-        );
+        sendReward(ownerOf(winnerZombieId), AMOUNT_REWARD * 10**uint256(18));
 
         // Check if the Zombie has enough exp -> UpLevel + Attack
         internalLevelUp(_zombieId);
@@ -176,29 +227,56 @@ contract ZombieAttack is ZombieHelper {
         return exp;
     }
 
-    function _attackByTurn(Zombie storage attackZombie, Zombie storage defenseZombie, uint currentHP) internal returns (uint) {
-        if ((100 * attackZombie.attack / defenseZombie.defense + 200) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * _checkCrit(attackZombie.criticalRate)) >= currentHP) {
+    function _attackByTurn(
+        Zombie storage attackZombie,
+        Zombie storage defenseZombie,
+        uint currentHP
+    ) internal returns (uint) {
+        if (
+            ((100 * attackZombie.attack) / defenseZombie.defense + 200) *
+                (1 +
+                    ((attackZombie.criticalDamage * 15) / 100 - 1) *
+                    _checkCrit(attackZombie.criticalRate)) >=
+            currentHP
+        ) {
             currentHP = 0;
         } else {
-            currentHP = currentHP - (100 * attackZombie.attack / defenseZombie.defense + 200) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * _checkCrit(attackZombie.criticalRate));
+            currentHP =
+                currentHP -
+                ((100 * attackZombie.attack) / defenseZombie.defense + 200) *
+                (1 +
+                    ((attackZombie.criticalDamage * 15) / 100 - 1) *
+                    _checkCrit(attackZombie.criticalRate));
         }
 
         return currentHP;
     }
 
-    function _attackByTurnAndUpdateFightScripts(Zombie storage attackZombie, Zombie storage defenseZombie, uint currentHP) internal returns (uint, FightScriptStruct memory) {
+    function _attackByTurnAndUpdateFightScripts(
+        Zombie storage attackZombie,
+        Zombie storage defenseZombie,
+        uint currentHP
+    ) internal returns (uint, FightScriptStruct memory) {
         uint isCrit = _checkCrit(attackZombie.criticalRate);
-        if ((100 * attackZombie.attack / defenseZombie.defense + 200) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * isCrit) >= currentHP) {
+        if (
+            ((100 * attackZombie.attack) / defenseZombie.defense + 200) *
+                (1 + ((attackZombie.criticalDamage * 15) / 100 - 1) * isCrit) >=
+            currentHP
+        ) {
             currentHP = 0;
         } else {
-            currentHP = currentHP - (100 * attackZombie.attack / defenseZombie.defense + 200) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * isCrit);
+            currentHP =
+                currentHP -
+                ((100 * attackZombie.attack) / defenseZombie.defense + 200) *
+                (1 + ((attackZombie.criticalDamage * 15) / 100 - 1) * isCrit);
         }
 
         // Update fightScripts
         FightScriptStruct memory fightScript = FightScriptStruct(
             attackZombie.id,
             isCrit,
-            (100 * attackZombie.attack / defenseZombie.defense + 200) * (1 + (attackZombie.criticalDamage * 15 / 100 - 1) * isCrit),
+            ((100 * attackZombie.attack) / defenseZombie.defense + 200) *
+                (1 + ((attackZombie.criticalDamage * 15) / 100 - 1) * isCrit),
             currentHP
         );
 
@@ -213,10 +291,10 @@ contract ZombieAttack is ZombieHelper {
         uint loserExp
     ) internal {
         // If exp reaches max -> don't increase exp anymore
-        if(winZombie.exp <= EXP_UP_LEVEL[LVL_MAX - 2]) {
+        if (winZombie.exp <= EXP_UP_LEVEL[LVL_MAX - 2]) {
             winZombie.exp = winZombie.exp.add(winnerExp);
         }
-        if(lossZombie.exp <= EXP_UP_LEVEL[LVL_MAX - 2]) {
+        if (lossZombie.exp <= EXP_UP_LEVEL[LVL_MAX - 2]) {
             lossZombie.exp = lossZombie.exp.add(loserExp);
         }
         winZombie.winCount = winZombie.winCount.add(1);

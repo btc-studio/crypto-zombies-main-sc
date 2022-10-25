@@ -2,12 +2,11 @@
 pragma solidity ^0.8.16;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./Ownable.sol";
 import "./SafeMath.sol";
 import "./ZombieBase.sol";
 
-contract ZombieFactory is ZombieBase, ERC721 {
+contract ZombieFactory is ZombieBase {
     using SafeMath for uint256;
     using SafeMath32 for uint32;
     using SafeMath16 for uint16;
@@ -33,10 +32,7 @@ contract ZombieFactory is ZombieBase, ERC721 {
         uint32 level
     );
 
-    constructor(address _token)
-        ZombieBase(_token)
-        ERC721("CryptoZombieNFT", "CZB")
-    {}
+    constructor(address _token) ZombieBase(_token) {}
 
     // external method: order view -> pure
 
@@ -97,8 +93,6 @@ contract ZombieFactory is ZombieBase, ERC721 {
         );
 
         zombies.push(zombie);
-        zombieToOwner[id] = msg.sender;
-        ownerZombieCount[msg.sender] = ownerZombieCount[msg.sender].add(1);
 
         _safeMint(msg.sender, tokenCount);
         emit NewZombie(msg.sender, id, _name, _dna, sex, 1);
