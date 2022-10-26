@@ -36,10 +36,6 @@ contract ZombieFeeding is ZombieFactory {
 
     constructor(address _token) ZombieFactory(_token) {}
 
-    function setKittyContractAddress(address _address) external onlyOwner {
-        kittyContract = KittyInterface(_address);
-    }
-
     function _triggerCooldown(Zombie storage _zombie) internal {
         _zombie.readyTime = uint32(block.timestamp + cooldownTime);
     }
@@ -59,31 +55,6 @@ contract ZombieFeeding is ZombieFactory {
         returns (bool)
     {
         return bytes(input).length > 0;
-    }
-
-    function feedAndMultiply(
-        uint _zombieId,
-        uint _targetDna,
-        string memory _species
-    ) internal onlyOwnerOf(_zombieId) {
-        Zombie storage myZombie = zombies[_zombieId - 1];
-        require(_isReady(myZombie));
-        _targetDna = _targetDna % dnaModulus;
-        uint newDna = (myZombie.dna + _targetDna) / 2;
-        if (
-            keccak256(abi.encodePacked(_species)) ==
-            keccak256(abi.encodePacked("kitty"))
-        ) {
-            newDna = newDna - (newDna % 100) + 99;
-        }
-        _createZombie("NoName", newDna);
-        _triggerCooldown(myZombie);
-    }
-
-    function feedOnKitty(uint _zombieId, uint _kittyId) public {
-        uint kittyDna;
-        (, , , , , , , , , kittyDna) = kittyContract.getKitty(_kittyId);
-        feedAndMultiply(_zombieId, kittyDna, "kitty");
     }
 
     function _generateDna(
@@ -106,73 +77,17 @@ contract ZombieFeeding is ZombieFactory {
         Zombie storage father = zombies[_fatherId - 1];
         Zombie storage mother = zombies[_motherId - 1];
 
-        // Kiểm tra điều kiện
+        // Check conditions
         require(_isCanBreed(father));
         require(_isCanBreed(mother));
         require(_stringNotEmptyOrNull(_name));
         require(father.sex != mother.sex);
 
-        // Add số lượt sinh sản
+        // Increase breed Count
         father.breedCount = father.breedCount.add(1);
         mother.breedCount = mother.breedCount.add(1);
         // Tinh toán DNA Zombie con từ DNA của bố mẹ
         uint newKittyDna = _generateDna(father.dna, mother.dna, _name);
         _createZombie(_name, newKittyDna);
     }
-
-    /// For testing
-    /// -------------------------------------------------
-    function setLevelZombie(uint _zombieId, uint32 level)
-        public
-        onlyOwnerOf(_zombieId)
-    {
-        Zombie storage zombie = zombies[_zombieId - 1];
-
-        // Update zombie level
-        if (level >= LVL_MAX) level = LVL_MAX;
-        zombie.level = level;
-
-        // Update zombie exp
-        zombie.exp = EXP_UP_LEVEL[level - 2];
-    }
-
-    // For testing
-    function setSexZombie(uint _zombieId, Sex sex)
-        public
-        onlyOwnerOf(_zombieId)
-    {
-        Zombie storage zombie = zombies[_zombieId - 1];
-        zombie.sex = sex;
-    }
-
-    function setRarityZombie(uint _zombieId, string memory rarity) public {
-        Zombie storage zombie = zombies[_zombieId - 1];
-        zombie.rarity = rarity;
-    }
-
-    function setStatZombie(
-        uint _zombieId,
-        uint32 healthPoint,
-        uint32 attack,
-        uint32 defense,
-        uint32 criticalRate,
-        uint32 criticalDamage,
-        uint32 speed,
-        uint32 combatPower
-    ) public {
-        Zombie storage zombie = zombies[_zombieId - 1];
-        zombie.healthPoint = healthPoint;
-        zombie.attack = attack;
-        zombie.defense = defense;
-        zombie.criticalRate = criticalRate;
-        zombie.criticalDamage = criticalDamage;
-        zombie.speed = speed;
-        zombie.combatPower = combatPower;
-    }
-
-    function setName(uint _zombieId, string memory _name) public {
-        Zombie storage zombie = zombies[_zombieId - 1];
-        zombie.name = _name;
-    }
-    /// -------------------------------------------------
 }

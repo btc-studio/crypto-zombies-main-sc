@@ -38,7 +38,7 @@ contract ZombieFactory is ZombieBase {
 
     // public method
     function createRandomZombie(string memory _name)
-        public
+        internal
         returns (Zombie memory)
     {
         uint randDna = _generateRandomDna(_name);
@@ -46,7 +46,7 @@ contract ZombieFactory is ZombieBase {
         return _createZombie(_name, randDna);
     }
 
-    function createManyZombie(uint count) public returns (Zombie[] memory) {
+    function createManyZombie(uint count) internal returns (Zombie[] memory) {
         uint i;
         Zombie[] memory zombies = new Zombie[](count);
         for (i = 0; i < count; i += 1) {
