@@ -1,13 +1,13 @@
-# Crypto Zombies Project
+# BTC Zombie Project
 
 ## Useful Links
 
 ---
 
-1. [Crypto Zombies Domain](http://dev.crypto-zombie.ai-studio-work.net/)
-2. [Crypto Zombies Repository](https://github.com/btc-studio/crypto-zombies-main-sc)
+1. [BTC Zombie Domain](http://dev.crypto-zombie.ai-studio-work.net/)
+2. [BTC Zombie Repository](https://github.com/btc-studio/crypto-zombies-main-sc)
 
-## What is Crypto Zombies?
+## What is BTC Zombie?
 
 ---
 
@@ -44,7 +44,7 @@ A solidity smart contract for the Ethereum based zombie game.
   - Decimal: 18
 - Click `Add tokens`
 
-## Crypto Zombies Repository
+## BTC Zombie Repository
 
 ---
 
@@ -77,12 +77,12 @@ crypto-zombies-main-sc
 ### Directory Details
 
 - **config.json** - Contains the address where the smart contract is being deployed to
-- **contracts** - The folder contains all the logic for Crypto Zombies
+- **contracts** - The folder contains all the logic for BTC Zombie
 - **hardhat.config.ts** - Contains network connections config
 - **scripts** - Contains deploy code
-- **test** - Contains unit test for the Crypto Zombies code
+- **test** - Contains unit test for the BTC Zombie code
 
-## Interacting with the Crypto Zombies contracts locally
+## Interacting with the BTC Zombie contracts locally
 
 ---
 
@@ -156,4 +156,4 @@ development
 
 |      CONTRACT      |                  ADDRESS                   |
 | :----------------: | :----------------------------------------: |
-| **Crypto Zombies** | 0xa193cd47122bEAE47979ac146Fd04f9f45d33057 |
+| **BTC Zombie** | 0xa193cd47122bEAE47979ac146Fd04f9f45d33057 |
