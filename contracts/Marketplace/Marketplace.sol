@@ -62,7 +62,6 @@ contract Marketplace is ReentrancyGuard {
         uint _price
     ) external nonReentrant {
         require(_price > 0, "Price must be greater than zero");
-        // Increment itemCount
         itemCount++;
         // Transfer nft
         _nft.transferFrom(msg.sender, address(this), _tokenId);

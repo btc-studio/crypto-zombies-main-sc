@@ -1,5 +1,5 @@
 {
-  "name": "crypto-zombies",
+  "name": "btc-zombies",
   "scripts": {
     "test": "hardhat test",
     "deploy": "hardhat run scripts/deploy.ts --network",

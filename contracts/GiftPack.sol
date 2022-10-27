@@ -11,13 +11,8 @@ contract GiftPack is ZombieAttack {
     constructor(address _token) ZombieAttack(_token) {}
 
     function openStaterPack() public {
-        // require number zombies < STATER_ZOMBIE_COUNT
         require(_getNumberZombiesOfOwner(msg.sender) < STATER_ZOMBIE_COUNT);
 
-        // create zombies
-        emit OpenStaterPack(
-            msg.sender,
-            createManyZombie(STATER_ZOMBIE_COUNT)
-        );
+        emit OpenStaterPack(msg.sender, createManyZombie(STATER_ZOMBIE_COUNT));
     }
 }
