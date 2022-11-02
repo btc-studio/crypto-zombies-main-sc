@@ -37,7 +37,7 @@ contract ZombieAttack is ZombieHelper {
 
         // Find Zombie
         uint _targetId = randomZombie(_zombieId);
-        require(_targetId < zombies.length);
+        require(_targetId <= tokenCount);
         return _targetId;
     }
 
@@ -45,8 +45,8 @@ contract ZombieAttack is ZombieHelper {
         external
         onlyOwnerOf(_zombieId)
     {
-        Zombie storage myZombie = zombies[_zombieId - 1];
-        Zombie storage enemyZombie = zombies[_targetId - 1];
+        Zombie storage myZombie = zombies[_zombieId];
+        Zombie storage enemyZombie = zombies[_targetId];
 
         uint winnerZombieId = _targetId;
 
@@ -207,6 +207,14 @@ contract ZombieAttack is ZombieHelper {
         // Reward BTCS Token if the Smart Contract has enough BTCS
         // TODO: Need a mechanism to ensure the reward for user when SC is out of BTCS Token
         sendReward(ownerOf(winnerZombieId), AMOUNT_REWARD * 10**uint256(18));
+
+        // If the user wins -> Have a chance of 0.1% to get a DNA Sample
+        if (_zombieId == winnerZombieId) {
+            uint rand = randMod(1000);
+            if (rand < 1) {
+                generateDnaSample();
+            }
+        }
 
         // Check if the Zombie has enough exp -> UpLevel + Attack
         internalLevelUp(_zombieId);

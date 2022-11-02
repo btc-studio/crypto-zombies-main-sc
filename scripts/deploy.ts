@@ -7,7 +7,7 @@ async function main() {
   const [deployer] = await ethers.getSigners();
   console.log("deploy from address: ", deployer.address);
 
-  const tokenContract = "0xEcF3F554f58e9eF274aa3DF60f9c9ca3Ba156073";
+  const tokenContract = "0x5C04B8257C62B77165Ff8025e285B0D2a2cf42Be";
 
   console.log("BTCS token contract address: ", tokenContract);
   // Set BTCS token contract address to config.json
@@ -23,7 +23,7 @@ async function main() {
   Config.setConfig(network + ".cryptoZombie", cryptoZombie.address);
 
   // --------------------------------------------------------------------
-  const marketFeePercent = 1;
+  const marketFeePercent = 10;
   const Marketplace = await ethers.getContractFactory("Marketplace");
   const marketplace = await Marketplace.deploy(marketFeePercent);
   await marketplace.deployed();
