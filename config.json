@@ -1,9 +1,9 @@
 {
   "dev": {},
   "bsctest": {
-    "cryptoZombie": "0x94BAF8283959BE344cdbBde203eA79880DE66600",
-    "marketplace": "0x9C4bA7B81404567fa2F3cD28B4e9b9252476E564",
-    "btcs": "0xEcF3F554f58e9eF274aa3DF60f9c9ca3Ba156073"
+    "cryptoZombie": "0x6A2C3B8DA60c98F06cDa09E7c372b2829EC2313C",
+    "marketplace": "0x61488aedfFbDCeE96422cF8917E99B622DAec624",
+    "btcs": "0x5C04B8257C62B77165Ff8025e285B0D2a2cf42Be"
   },
   "rinkeby": {},
   "main": {}

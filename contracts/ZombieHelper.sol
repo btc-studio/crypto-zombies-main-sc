@@ -9,7 +9,7 @@ contract ZombieHelper is ZombieFeeding {
     using SafeMath16 for uint16;
 
     modifier aboveLevel(uint _level, uint _zombieId) {
-        require(zombies[_zombieId - 1].level >= _level);
+        require(zombies[_zombieId].level >= _level);
         _;
     }
 
@@ -27,7 +27,7 @@ contract ZombieHelper is ZombieFeeding {
     {
         uint[] memory result = new uint[](_getNumberZombiesOfOwner(_owner));
         uint counter = 0;
-        for (uint i = 0; i < zombies.length; i += 1) {
+        for (uint i = 0; i < zombieCount; i += 1) {
             if (ownerOf(zombies[i].id) == _owner) {
                 result[counter] = i;
                 counter++;
@@ -38,7 +38,7 @@ contract ZombieHelper is ZombieFeeding {
 
     // public method
     function _isNotOnlyOwner() public view returns (bool) {
-        return _getNumberZombiesOfOwner(msg.sender) != zombies.length;
+        return _getNumberZombiesOfOwner(msg.sender) != zombieCount;
     }
 
     // internal method
@@ -49,8 +49,8 @@ contract ZombieHelper is ZombieFeeding {
     {
         uint count = 0;
 
-        for (uint index = 0; index < zombies.length; index += 1) {
-            if (_owner == ownerOf(zombies[index].id)) {
+        for (uint index = 0; index < zombieCount; index += 1) {
+            if (_owner == ownerOf(zombies[zombiesKeys[index]].id)) {
                 count += 1;
             }
         }

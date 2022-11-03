@@ -74,8 +74,12 @@ contract ZombieFeeding is ZombieFactory {
         uint _motherId,
         string memory _name
     ) public onlyOwnerOf(_fatherId) onlyOwnerOf(_motherId) {
-        Zombie storage father = zombies[_fatherId - 1];
-        Zombie storage mother = zombies[_motherId - 1];
+        Zombie storage father = zombies[_fatherId];
+        Zombie storage mother = zombies[_motherId];
+
+        uint dnaRarity = _randomDnaRarity();
+
+        string memory zombieRarity = _randomZombieRarity(dnaRarity);
 
         // Check conditions
         require(_isCanBreed(father));
@@ -88,6 +92,6 @@ contract ZombieFeeding is ZombieFactory {
         mother.breedCount = mother.breedCount.add(1);
         // Tinh toán DNA Zombie con từ DNA của bố mẹ
         uint newKittyDna = _generateDna(father.dna, mother.dna, _name);
-        _createZombie(_name, newKittyDna);
+        _createZombie(_name, newKittyDna, zombieRarity);
     }
 }

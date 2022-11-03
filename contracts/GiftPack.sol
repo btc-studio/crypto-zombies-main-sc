@@ -4,21 +4,21 @@ pragma solidity ^0.8.16;
 import "./ZombieAttack.sol";
 
 contract GiftPack is ZombieAttack {
-    uint public constant STATER_ZOMBIE_COUNT = 3;
-    mapping(address => bool) public seenWalletOpenStaterPack;
+    uint public constant STARTER_ZOMBIE_COUNT = 3;
+    mapping(address => bool) public seenWalletOpenStarterPack;
 
-    event OpenStaterPack(address indexed owner, Zombie[] zombies);
+    event OpenStarterPack(address indexed owner, Zombie[] zombies);
 
     constructor(address _token) ZombieAttack(_token) {}
 
     function checkOpenStarterPack(address _address) public view returns (bool) {
-        return seenWalletOpenStaterPack[_address];
+        return seenWalletOpenStarterPack[_address];
     }
 
-    function openStaterPack() public {
+    function openStarterPack() public {
         require(!checkOpenStarterPack(msg.sender));
-        seenWalletOpenStaterPack[msg.sender] = true;
+        seenWalletOpenStarterPack[msg.sender] = true;
 
-        emit OpenStaterPack(msg.sender, createManyZombie(STATER_ZOMBIE_COUNT));
+        emit OpenStarterPack(msg.sender, createManyZombie(STARTER_ZOMBIE_COUNT));
     }
 }
