@@ -5,18 +5,18 @@ import "./ZombieAttack.sol";
 
 contract GiftPack is ZombieAttack {
     uint public constant STATER_ZOMBIE_COUNT = 3;
-    mapping(address => bool) seenWalletOpenStaterPack;
+    mapping(address => bool) public seenWalletOpenStaterPack;
 
     event OpenStaterPack(address indexed owner, Zombie[] zombies);
 
     constructor(address _token) ZombieAttack(_token) {}
 
-    function checkOpenStarterPack() public view returns (bool) {
-        return seenWalletOpenStaterPack[msg.sender];
+    function checkOpenStarterPack(address _address) public view returns (bool) {
+        return seenWalletOpenStaterPack[_address];
     }
 
     function openStaterPack() public {
-        require(!checkOpenStarterPack());
+        require(!checkOpenStarterPack(msg.sender));
         seenWalletOpenStaterPack[msg.sender] = true;
 
         emit OpenStaterPack(msg.sender, createManyZombie(STATER_ZOMBIE_COUNT));
