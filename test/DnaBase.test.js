@@ -30,27 +30,16 @@ describe("DnaBase", function () {
       // Owner of the DNA should be addr1
       expect(await nft.ownerOf(1)).to.equal(addr1.address);
 
-      // After open DNA Sample -> dna.isOpened should be 'true'
+      // After open DNA Sample -> dna should be removed from mapping (which mean everything turns to 0)
       const openedDna = await nft.dnas(1);
-      expect(openedDna.isOpened).to.equal(true);
-
-      // Get zombie from zombies mapping then check fields to ensure they are correct
-      const zombie = await nft.zombies(4);
-
-      expect(zombie.dna).to.equal(openedDna.dna);
+      expect(openedDna.id).to.equal(0);
     });
 
     it("Should fail if the account opens the DNA is not the owner", async function () {
-      const dna = await nft.dnas(1);
+      await nft.connect(addr1).generateDnaSample(addr1.address);
+      const dna = await nft.dnas(13);
       await expect(nft.connect(addr2).openDna(dna.id)).to.be.revertedWith(
         "Only owner of the DNA can open it"
-      );
-    });
-
-    it("Should fail if user opens the opened DNA Sample", async function () {
-      const dna = await nft.dnas(1);
-      await expect(nft.connect(addr1).openDna(dna.id)).to.be.revertedWith(
-        "This DNA Sample has been opened"
       );
     });
   });

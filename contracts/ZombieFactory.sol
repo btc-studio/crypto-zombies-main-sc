@@ -43,9 +43,11 @@ contract ZombieFactory is ZombieBase {
         returns (Zombie memory)
     {
         uint randDna = _generateRandomDna(_name);
-        uint rarity = _randomDnaRarity();
+        uint dnaRarity = _randomDnaRarity();
+        string memory zombieRarity = _randomZombieRarity(dnaRarity);
+
         randDna = randDna - (randDna % 100);
-        return _createZombie(_name, randDna, rarity);
+        return _createZombie(_name, randDna, zombieRarity);
     }
 
     function createManyZombie(uint count) internal returns (Zombie[] memory) {
@@ -62,7 +64,7 @@ contract ZombieFactory is ZombieBase {
     function _createZombie(
         string memory _name,
         uint _dna,
-        uint _dnaRarity
+        string memory _zombieRarity
     ) internal returns (Zombie memory) {
         tokenCount++;
         zombieCount++;
@@ -74,8 +76,6 @@ contract ZombieFactory is ZombieBase {
         if (bytes(_realName).length == 0) {
             _realName = Strings.toString(BASE_NAME + id);
         }
-
-        string memory zombieRarity = _randomZombieRarity(_dnaRarity);
 
         Zombie memory zombie = Zombie(
             id,
@@ -94,7 +94,7 @@ contract ZombieFactory is ZombieBase {
             BASE_CRIT_DAMAGE,
             BASE_SPEED,
             BASE_COMBAT_POWER,
-            zombieRarity,
+            _zombieRarity,
             0
         );
 
@@ -176,7 +176,7 @@ contract ZombieFactory is ZombieBase {
         uint i;
         Dna[] memory dnas = new Dna[](count);
         for (i = 0; i < count; i += 1) {
-            dnas[i] = generateDnaSample();
+            dnas[i] = generateDnaSample(msg.sender);
         }
 
         // Open 3 new generated dnas
@@ -188,7 +188,7 @@ contract ZombieFactory is ZombieBase {
     }
 
     // Generate random DNA Sample
-    function generateDnaSample() public returns (Dna memory) {
+    function generateDnaSample(address _owner) public returns (Dna memory) {
         tokenCount++;
         dnaCount++;
         uint id = tokenCount;
@@ -196,7 +196,7 @@ contract ZombieFactory is ZombieBase {
 
         randNonce = randNonce.add(1);
         uint rand = uint(
-            keccak256(abi.encodePacked(block.timestamp, msg.sender, randNonce))
+            keccak256(abi.encodePacked(block.timestamp, _owner, randNonce))
         );
 
         // Insert new DNA Sample to dnas mapping
@@ -205,10 +205,10 @@ contract ZombieFactory is ZombieBase {
         dnas[id] = dna;
         dnasKeys.push(id); // Update dnas keys array to track zombies's ids
 
-        _safeMint(msg.sender, tokenCount);
+        _safeMint(_owner, tokenCount);
 
         // Emit New DnaCreated event
-        emit NewDna(tokenCount, rand % dnaModulus, rarity, msg.sender);
+        emit NewDna(tokenCount, rand % dnaModulus, rarity, _owner);
 
         return dna;
     }
@@ -222,9 +222,12 @@ contract ZombieFactory is ZombieBase {
 
         Dna storage dna = dnas[_dnaId];
         require(dna.isOpened == false, "This DNA Sample has been opened");
-        Zombie memory zombie = _createZombie("", dna.dna, dna.rarity);
+
+        string memory zombieRarity = _randomZombieRarity(dna.rarity);
+        Zombie memory zombie = _createZombie("", dna.dna, zombieRarity);
 
         dnas[_dnaId].isOpened = true;
+        delete dnas[_dnaId];
 
         return zombie;
     }

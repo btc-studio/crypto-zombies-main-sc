@@ -212,7 +212,7 @@ contract ZombieAttack is ZombieHelper {
         if (_zombieId == winnerZombieId) {
             uint rand = randMod(1000);
             if (rand < 1) {
-                generateDnaSample();
+                generateDnaSample(ownerOf(_zombieId));
             }
         }
 
