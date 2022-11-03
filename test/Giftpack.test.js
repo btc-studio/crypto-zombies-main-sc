@@ -33,7 +33,7 @@ describe("GiftPack", () => {
         .undefined;
     });
 
-    it("Should return true if wallet already opened stater pack", async () => {
+    it("Should return true if wallet already opened starter pack", async () => {
       await mainSmartContract.connect(addr1).openStarterPack();
       const isOpenStarterPack = await mainSmartContract.checkOpenStarterPack(
         addr1.address
@@ -41,7 +41,7 @@ describe("GiftPack", () => {
       expect(isOpenStarterPack).to.be.true;
     });
 
-    it("Should throw error openStarterPack if wallet already opened stater pack", async () => {
+    it("Should throw error openStarterPack if wallet already opened starter pack", async () => {
       await mainSmartContract.connect(addr1).openStarterPack();
       try {
         await mainSmartContract.connect(addr1).openStarterPack();
