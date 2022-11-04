@@ -88,7 +88,7 @@ contract ZombieBase is DnaBase {
         return Sex(randMod(2));
     }
 
-    function randomZombie(uint _zombieId) internal view returns (uint) {
+    function findRandomZombie(uint _zombieId) internal view returns (uint) {
         uint counter = 0;
         uint[] memory result = new uint[](zombieCount);
         address _owner = ownerOf(_zombieId);

@@ -5,15 +5,15 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./Ownable.sol";
 import "./SafeMath.sol";
 
+uint8 constant USER_START_LEVEL = 1;
+uint8 constant USER_START_EXP = 0;
+uint8 constant USER_MAX_LEVEL_CAP = 20;
+
 contract UserBase is Ownable {
     using SafeMath for uint256;
     using SafeMath32 for uint32;
     using SafeMath16 for uint16;
     using SafeMath8 for uint8;
-
-    uint8 constant USER_START_LEVEL = 1;
-    uint8 constant USER_START_EXP = 0;
-    uint8 constant USER_MAX_LEVEL_CAP = 20;
 
     struct User {
         string name;

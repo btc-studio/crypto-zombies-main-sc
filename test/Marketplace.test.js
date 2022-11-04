@@ -10,11 +10,9 @@ describe("NFTMarketplace", function () {
   let feePercent = 1;
   let zombieName = "Zng";
   beforeEach(async function () {
-    // ft = "0xEcF3F554f58e9eF274aa3DF60f9c9ca3Ba156073";
-
     // Get contract factories
     const BTCS = await ethers.getContractFactory("BTCSToken");
-    const ZombieNFT = await ethers.getContractFactory("ZombieAttack");
+    const ZombieNFT = await ethers.getContractFactory("GiftPack");
     const Marketplace = await ethers.getContractFactory("Marketplace");
     // Get signers
     [deployer, addr1, addr2] = await ethers.getSigners();
@@ -27,6 +25,7 @@ describe("NFTMarketplace", function () {
     ft.transfer(addr1.address, toWei(10));
     ft.transfer(addr2.address, toWei(10));
   });
+
   describe("Deployment", function () {
     it("Should track name and symbol of the nft collection", async function () {
       expect(await nft.name()).to.equal("BTCZombieNFT");
@@ -39,25 +38,27 @@ describe("NFTMarketplace", function () {
   });
 
   describe("Minting NFTs", function () {
-    it("Should track each minted NFT", async function () {
-      // addr1 mints an NFT
-      await nft.connect(addr1).createRandomZombie(zombieName);
-      expect(await nft.tokenCount()).to.equal(1);
-      expect(await nft.balanceOf(addr1.address)).to.equal(1);
-      //   expect(await nft.tokenURI(1)).to.equal(URI);
+    beforeEach(async function () {
+      // addr1 creates 3 random DNAs
+      await nft.connect(addr1).openStarterPack();
+      // addr2 creates 3 random DNAs
+      await nft.connect(addr2).openStarterPack();
+    });
 
-      // addr1 mints an NFT
-      await nft.connect(addr2).createRandomZombie(zombieName);
-      expect(await nft.tokenCount()).to.equal(2);
-      expect(await nft.balanceOf(addr2.address)).to.equal(1);
+    it("Should track each minted NFT", async function () {
+      expect(await nft.tokenCount()).to.equal(12);
+
+      expect(await nft.balanceOf(addr1.address)).to.equal(6);
+      //   expect(await nft.tokenURI(1)).to.equal(URI);
+      expect(await nft.balanceOf(addr2.address)).to.equal(6);
       //   expect(await nft.tokenURI(2)).to.equal(URI);
     });
   });
 
   describe("Making marketplace item", function () {
     beforeEach(async function () {
-      // addr1 mints an nft
-      await nft.connect(addr1).createRandomZombie(zombieName);
+      // addr1 creates 3 random DNAs
+      await nft.connect(addr1).openStarterPack();
       // addr1 approve marketplace to spend nft
       await nft.connect(addr1).setApprovalForAll(marketplace.address, true);
     });
@@ -94,8 +95,8 @@ describe("NFTMarketplace", function () {
 
   describe("Remove items from marketplace", function () {
     beforeEach(async function () {
-      // addr1 mints an nft
-      await nft.connect(addr1).createRandomZombie(zombieName);
+      // addr1 creates 3 random DNAs
+      await nft.connect(addr1).openStarterPack();
       // addr1 approve marketplace to spend nft
       await nft.connect(addr1).setApprovalForAll(marketplace.address, true);
       // addr1 makes their nft a marketplace item
@@ -120,7 +121,6 @@ describe("NFTMarketplace", function () {
       await marketplace.connect(addr1).unmakeItem(nft.address, 1);
       // Now the owner of the NFT with tokenId = 1 should be addr1
       expect(await nft.ownerOf(1)).to.equal(addr1.address);
-
     });
   });
 
@@ -129,7 +129,7 @@ describe("NFTMarketplace", function () {
     let totalPriceInWei;
     beforeEach(async function () {
       // addr1 mints an nft
-      await nft.connect(addr1).createRandomZombie(zombieName);
+      await nft.connect(addr1).openStarterPack();
       // addr1 approve marketplace to spend nft
       await nft.connect(addr1).setApprovalForAll(marketplace.address, true);
       // addr1 makes their nft a marketplace item

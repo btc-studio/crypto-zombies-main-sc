@@ -3,8 +3,9 @@ pragma solidity ^0.8.16;
 
 import "./ZombieAttack.sol";
 
+uint constant STARTER_ZOMBIE_COUNT = 3;
+
 contract GiftPack is ZombieAttack {
-    uint public constant STARTER_ZOMBIE_COUNT = 3;
     mapping(address => bool) public seenWalletOpenStarterPack;
 
     event OpenStarterPack(address indexed owner, Zombie[] zombies);
@@ -19,6 +20,6 @@ contract GiftPack is ZombieAttack {
         require(!checkOpenStarterPack(msg.sender));
         seenWalletOpenStarterPack[msg.sender] = true;
 
-        emit OpenStarterPack(msg.sender, createManyZombie(STARTER_ZOMBIE_COUNT));
+        emit OpenStarterPack(msg.sender, _createManyDnas(STARTER_ZOMBIE_COUNT));
     }
 }

@@ -6,20 +6,20 @@ import "./Ownable.sol";
 import "./SafeMath.sol";
 import "./ZombieBase.sol";
 
+uint8 constant BASE_HEALTH_POINT = 10;
+uint8 constant BASE_ATTACK = 10;
+uint8 constant BASE_DEFENSE = 10;
+uint8 constant BASE_CRIT_RATE = 10;
+uint8 constant BASE_CRIT_DAMAGE = 10;
+uint8 constant BASE_SPEED = 10;
+uint8 constant BASE_COMBAT_POWER = 60;
+string constant BASE_RARITY = "A";
+uint constant BASE_NAME = 1000000;
+
 contract ZombieFactory is ZombieBase {
     using SafeMath for uint256;
     using SafeMath32 for uint32;
     using SafeMath16 for uint16;
-
-    uint8 public constant BASE_HEALTH_POINT = 10;
-    uint8 public constant BASE_ATTACK = 10;
-    uint8 public constant BASE_DEFENSE = 10;
-    uint8 public constant BASE_CRIT_RATE = 10;
-    uint8 public constant BASE_CRIT_DAMAGE = 10;
-    uint8 public constant BASE_SPEED = 10;
-    uint8 public constant BASE_COMBAT_POWER = 60;
-    string public constant BASE_RARITY = "A";
-    uint public constant BASE_NAME = 1000000;
 
     event NewZombie(
         address sender,
@@ -34,33 +34,6 @@ contract ZombieFactory is ZombieBase {
 
     constructor(address _token) ZombieBase(_token) {}
 
-    // external method: order view -> pure
-
-    // public method
-    // Create zombie directly
-    function createRandomZombie(string memory _name)
-        public
-        returns (Zombie memory)
-    {
-        uint randDna = _generateRandomDna(_name);
-        uint dnaRarity = _randomDnaRarity();
-        string memory zombieRarity = _randomZombieRarity(dnaRarity);
-
-        randDna = randDna - (randDna % 100);
-        return _createZombie(_name, randDna, zombieRarity);
-    }
-
-    function createManyZombie(uint count) internal returns (Zombie[] memory) {
-        uint i;
-        Zombie[] memory zombies = new Zombie[](count);
-        for (i = 0; i < count; i += 1) {
-            zombies[i] = createRandomZombie("");
-        }
-
-        return zombies;
-    }
-
-    // internal method
     function _createZombie(
         string memory _name,
         uint _dna,
@@ -99,7 +72,8 @@ contract ZombieFactory is ZombieBase {
         );
 
         zombies[id] = zombie;
-        zombiesKeys.push(id); // Update zombies keys array to track zombies's ids
+        // Update zombies keys array to track zombies's ids
+        zombiesKeys.push(id);
 
         _safeMint(msg.sender, tokenCount);
         emit NewZombie(msg.sender, id, _name, _dna, sex, 1);
@@ -172,19 +146,20 @@ contract ZombieFactory is ZombieBase {
         }
     }
 
-    function createManyDnas(uint count) public returns (Dna[] memory) {
+    function _createManyDnas(uint count) internal returns (Zombie[] memory) {
         uint i;
         Dna[] memory dnas = new Dna[](count);
+        Zombie[] memory zombies = new Zombie[](count);
         for (i = 0; i < count; i += 1) {
             dnas[i] = generateDnaSample(msg.sender);
         }
 
         // Open 3 new generated dnas
         for (i = 0; i < count; i += 1) {
-            openDna(dnas[i].id);
+            zombies[i] = openDna(dnas[i].id);
         }
 
-        return dnas;
+        return zombies;
     }
 
     // Generate random DNA Sample
@@ -203,7 +178,8 @@ contract ZombieFactory is ZombieBase {
         Dna memory dna = Dna(id, rand % dnaModulus, rarity, false);
 
         dnas[id] = dna;
-        dnasKeys.push(id); // Update dnas keys array to track zombies's ids
+        // Update dnas keys array to track zombies's ids
+        dnasKeys.push(id);
 
         _safeMint(_owner, tokenCount);
 
