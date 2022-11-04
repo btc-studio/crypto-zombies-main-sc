@@ -19,34 +19,29 @@ describe("ZombieFactory", function () {
   }
 
   describe("Create Zombie", function () {
-    it("Should create zombie with full stats", async function () {
+    it("Should create zombies with full stats", async function () {
       const { zombieFactory, owner, addr1, addr2 } = await loadFixture(
         deployOneYearLockFixture
       );
 
-      const zombie1 = await zombieFactory
-        .connect(addr1)
-        .createRandomZombie("Duong");
-      const zombie2 = await zombieFactory
-        .connect(addr2)
-        .createRandomZombie("Duong1");
-    });
-  });
+      await zombieFactory.connect(addr1).openStarterPack();
+      const zombie = await zombieFactory.zombies(4);
 
-  describe("Find Battle", function () {
-    it("Attack Zombie", async function () {
-      const { zombieFactory, owner, addr1, addr2 } = await loadFixture(
-        deployOneYearLockFixture
-      );
-
-      const zombie1 = await zombieFactory
-        .connect(addr1)
-        .createRandomZombie("Duong");
-      const zombie2 = await zombieFactory
-        .connect(addr2)
-        .createRandomZombie("Duong1");
-
-      const zombies = await zombieFactory.connect(addr1).zombies(1);
+      // 1, 2, 3: Dnas
+      // 4, 5, 6: Zombies
+      expect(zombie.id).to.equal(4);
+      expect(zombie.level).to.equal(1);
+      expect(zombie.winCount).to.equal(0);
+      expect(zombie.lossCount).to.equal(0);
+      expect(zombie.breedCount).to.equal(0);
+      expect(zombie.healthPoint).to.equal(10);
+      expect(zombie.attack).to.equal(10);
+      expect(zombie.defense).to.equal(10);
+      expect(zombie.criticalRate).to.equal(10);
+      expect(zombie.criticalDamage).to.equal(10);
+      expect(zombie.speed).to.equal(10);
+      expect(zombie.combatPower).to.equal(60);
+      expect(zombie.exp).to.equal(0);
     });
   });
 });

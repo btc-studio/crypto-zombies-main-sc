@@ -8,14 +8,8 @@ contract ZombieHelper is ZombieFeeding {
     using SafeMath32 for uint32;
     using SafeMath16 for uint16;
 
-    modifier aboveLevel(uint _level, uint _zombieId) {
-        require(zombies[_zombieId].level >= _level);
-        _;
-    }
-
     constructor(address _token) ZombieFeeding(_token) {}
 
-    // external method: order: view -> pure
     function withdraw() external onlyOwner {
         payable(owner).transfer(address(this).balance);
     }
@@ -36,12 +30,10 @@ contract ZombieHelper is ZombieFeeding {
         return result;
     }
 
-    // public method
-    function _isNotOnlyOwner() public view returns (bool) {
+    function _isNotOnlyOwner() internal view returns (bool) {
         return _getNumberZombiesOfOwner(msg.sender) != zombieCount;
     }
 
-    // internal method
     function _getNumberZombiesOfOwner(address _owner)
         internal
         view

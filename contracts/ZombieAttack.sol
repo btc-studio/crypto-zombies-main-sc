@@ -36,7 +36,7 @@ contract ZombieAttack is ZombieHelper {
         require(_isNotOnlyOwner());
 
         // Find Zombie
-        uint _targetId = randomZombie(_zombieId);
+        uint _targetId = findRandomZombie(_zombieId);
         require(_targetId <= tokenCount);
         return _targetId;
     }
