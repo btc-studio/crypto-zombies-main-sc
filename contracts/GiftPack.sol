@@ -6,7 +6,7 @@ import "./ZombieAttack.sol";
 uint constant STARTER_ZOMBIE_COUNT = 3;
 
 contract GiftPack is ZombieAttack {
-    mapping(address => bool) public seenWalletOpenStarterPack;
+    mapping(address => bool) seenWalletOpenStarterPack;
 
     event OpenStarterPack(address indexed owner, Zombie[] zombies);
 
