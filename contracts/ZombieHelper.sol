@@ -10,6 +10,8 @@ contract ZombieHelper is ZombieFeeding {
 
     constructor(address _token) ZombieFeeding(_token) {}
 
+    event ZombieNameChanged(uint _zombieId, string newName);
+
     function withdraw() external onlyOwner {
         payable(owner).transfer(address(this).balance);
     }
@@ -32,6 +34,14 @@ contract ZombieHelper is ZombieFeeding {
         }
 
         return count;
+    }
+
+    function changeZombieName(uint _zombieId, string memory _name) public {
+        require(ownerOf(_zombieId) == msg.sender, "Only owner of the Zombie can change it's name");
+
+        zombies[_zombieId].name = _name;
+
+        emit ZombieNameChanged(_zombieId, _name);
     }
 
     // private method
