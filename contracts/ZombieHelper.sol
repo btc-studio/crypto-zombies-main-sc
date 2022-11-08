@@ -14,22 +14,6 @@ contract ZombieHelper is ZombieFeeding {
         payable(owner).transfer(address(this).balance);
     }
 
-    function getZombiesByOwner(address _owner)
-        external
-        view
-        returns (uint[] memory)
-    {
-        uint[] memory result = new uint[](_getNumberZombiesOfOwner(_owner));
-        uint counter = 0;
-        for (uint i = 0; i < zombieCount; i += 1) {
-            if (ownerOf(zombies[i].id) == _owner) {
-                result[counter] = i;
-                counter++;
-            }
-        }
-        return result;
-    }
-
     function _isNotOnlyOwner() internal view returns (bool) {
         return _getNumberZombiesOfOwner(msg.sender) != zombieCount;
     }
