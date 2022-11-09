@@ -35,6 +35,7 @@ describe("GiftPack", () => {
 
     it("Should return true if wallet already opened starter pack", async () => {
       await mainSmartContract.connect(addr1).openStarterPack();
+      await mainSmartContract.connect(addr2).openStarterPack();
       const isOpenStarterPack = await mainSmartContract.checkOpenStarterPack(
         addr1.address
       );

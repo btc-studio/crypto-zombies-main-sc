@@ -1,8 +1,8 @@
-import { expect } from "chai";
-import { loadFixture } from "ethereum-waffle";
-import { ethers } from "hardhat";
+import { expect } from 'chai';
+import { loadFixture } from 'ethereum-waffle';
+import { ethers } from 'hardhat';
 
-describe("ZombieFactory", function () {
+describe('ZombieFactory', function () {
   // We define a fixture to reuse the same setup in every test.
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
@@ -10,22 +10,24 @@ describe("ZombieFactory", function () {
     // Contracts are deployed using the first signer/account by default
     const [owner, addr1, addr2] = await ethers.getSigners();
 
-    const tokenContract = "0x5C04B8257C62B77165Ff8025e285B0D2a2cf42Be";
-    const ZombieFactory = await ethers.getContractFactory("GiftPack");
+    const tokenContract = '0x5C04B8257C62B77165Ff8025e285B0D2a2cf42Be';
+    const ZombieFactory = await ethers.getContractFactory('GiftPack');
     const zombieFactory = await ZombieFactory.deploy(tokenContract);
     await zombieFactory.deployed();
 
     return { zombieFactory, owner, addr1, addr2 };
   }
 
-  describe("Create Zombie", function () {
-    it("Should create zombies with full stats", async function () {
-      const { zombieFactory, owner, addr1, addr2 } = await loadFixture(
+  describe('Create Zombie', function () {
+    it('Should create zombies with full stats', async function () {
+      const { zombieFactory, addr1 } = await loadFixture(
         deployOneYearLockFixture
       );
 
       await zombieFactory.connect(addr1).openStarterPack();
       const zombie = await zombieFactory.zombies(4);
+      const zombies = await zombieFactory.getZombieOf(addr1.address);
+      expect(zombies.length).to.equal(3);
 
       // 1, 2, 3: Dnas
       // 4, 5, 6: Zombies

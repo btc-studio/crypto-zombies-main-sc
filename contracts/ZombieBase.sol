@@ -19,8 +19,10 @@ contract ZombieBase is DnaBase {
     uint public tokenCount;
     uint public zombieCount;
     uint[] public zombiesKeys; // Contain keys of the zombies mapping (for iterating)
+    mapping(uint => Zombie) public zombies;
     uint public dnaCount;
     uint[] public dnasKeys; // Contain keys of the dnas mapping (for iterating)
+    mapping(string => uint) rarityToGrowStat; // Mapping rarity to grow stat ('A' -> 9, 'S' -> 11)
 
     struct Zombie {
         uint id;
@@ -65,11 +67,6 @@ contract ZombieBase is DnaBase {
         60709
     ];
 
-    // zombieId -> Zombie
-    mapping(uint => Zombie) public zombies;
-
-    mapping(string => uint) rarityToGrowStat; // Mapping rarity to grow stat ('A' -> 9, 'S' -> 11)
-
     enum Sex {
         Male,
         Female
@@ -84,6 +81,26 @@ contract ZombieBase is DnaBase {
         rarityToGrowStat["SSS"] = 20;
     }
 
+    function getZombieOf(address _owner) public view returns (Zombie[] memory) {
+        uint ownerZombieCount = 0;
+        for (uint i = 0; i < zombieCount; i += 1) {
+            if (ownerOf(zombiesKeys[i]) == _owner) {
+                ownerZombieCount += 1;
+            }
+        }
+
+        Zombie[] memory ownerZombies = new Zombie[](ownerZombieCount);
+        uint ownerZombieIndex = 0;
+        for (uint i = 0; i < zombieCount; i += 1) {
+            if (ownerOf(zombiesKeys[i]) == _owner) {
+                ownerZombies[ownerZombieIndex] = zombies[zombiesKeys[i]];
+                ownerZombieIndex += 1;
+            }
+        }
+
+        return ownerZombies;
+    }
+
     function randomSex() internal returns (Sex) {
         return Sex(randMod(2));
     }
@@ -96,7 +113,7 @@ contract ZombieBase is DnaBase {
         // Get all possible zombies to battle (zombie not of the current owner and not dnas)
         for (uint i = 0; i < zombieCount; i++) {
             if (_owner != ownerOf(zombies[zombiesKeys[i]].id)) {
-                result[counter] = zombiesKeys[i];
+                result[counter] = zombies[zombiesKeys[i]].id;
                 counter++;
             }
         }
@@ -108,7 +125,7 @@ contract ZombieBase is DnaBase {
             return result[rand];
         }
 
-        return zombieCount - 1;
+        return zombies[zombiesKeys[zombieCount - 1]].id;
     }
 
     function internalLevelUp(uint _zombieId) internal {
