@@ -186,8 +186,8 @@ describe("NFTMarketplace", function () {
       // The buyer should now own the nft
       expect(await nft.ownerOf(1)).to.equal(addr2.address);
 
-      // Item should be marked as sold
-      expect((await marketplace.items(1)).sold).to.equal(true);
+      // Item should be deleted from the array
+      expect((await marketplace.items(1)).itemId).to.equal(0);
     });
 
     it("Should fail for invalid item ids, sold items and when not enough BTCS is paid", async function () {
@@ -210,10 +210,9 @@ describe("NFTMarketplace", function () {
 
       // addr2 purchases item 1
       await marketplace.connect(addr2).purchaseItem(totalPriceInWei, 1);
-      // deployer tries purchasing item 1 after its been sold
-      await expect(
-        marketplace.connect(deployer).purchaseItem(totalPriceInWei, 1)
-      ).to.be.revertedWith("Item already sold");
+      // After purchasing -> Delete item from mapping (Data all zero)
+      const item = await marketplace.items(1);
+      expect(item.itemId).to.equal(0);
     });
   });
 });

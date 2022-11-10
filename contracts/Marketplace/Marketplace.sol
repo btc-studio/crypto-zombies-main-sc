@@ -96,10 +96,11 @@ contract Marketplace is ReentrancyGuard {
         // Transfer nft
         _nft.transferFrom(address(this), msg.sender, item.tokenId);
 
-        // Remove _itemId from items mapping
-        delete items[_itemId];
         // Emit Offered event
         emit Unoffered(_itemId, address(_nft), item.tokenId);
+
+        // Remove _itemId from items mapping
+        delete items[_itemId];
     }
 
     /// @notice Buy an NFT on the Marketplace
@@ -140,6 +141,9 @@ contract Marketplace is ReentrancyGuard {
             item.seller,
             msg.sender
         );
+
+        // Remove _itemId from items mapping
+        delete items[_itemId];
     }
 
     // Get the price set by the seller + the market fee
