@@ -38,6 +38,7 @@ contract ZombieHelper is ZombieFeeding {
 
     function changeZombieName(uint _zombieId, string memory _name) public {
         require(ownerOf(_zombieId) == msg.sender, "Only owner of the Zombie can change it's name");
+        require((bytes(_name)).length > 0, "Zombie name cannot be empty");
 
         zombies[_zombieId].name = _name;
 

@@ -35,5 +35,11 @@ describe("DnaBase", function () {
         nft.connect(addr2).changeZombieName(4, "Zuong Fail")
       ).to.be.revertedWith("Only owner of the Zombie can change it's name");
     });
+
+    it("Should fail if the new name of the Zombie is empty", async function () {
+        await expect(
+          nft.connect(addr1).changeZombieName(4, "")
+        ).to.be.revertedWith("Zombie name cannot be empty");
+      });
   });
 });

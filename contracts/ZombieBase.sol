@@ -101,6 +101,26 @@ contract ZombieBase is DnaBase {
         return ownerZombies;
     }
 
+    function getDnaOf(address _owner) public view returns (Dna[] memory) {
+        uint ownerDnaCount = 0;
+        for (uint i = 0; i < dnaCount; i += 1) {
+            if (ownerOf(dnasKeys[i]) == _owner) {
+                ownerDnaCount += 1;
+            }
+        }
+
+        Dna[] memory ownerDnas = new Dna[](ownerDnaCount);
+        uint ownerDnaIndex = 0;
+        for (uint i = 0; i < dnaCount; i += 1) {
+            if (ownerOf(dnasKeys[i]) == _owner) {
+                ownerDnas[ownerDnaIndex] = dnas[dnasKeys[i]];
+                ownerDnaIndex += 1;
+            }
+        }
+
+        return ownerDnas;
+    }
+
     function randomSex() internal returns (Sex) {
         return Sex(randMod(2));
     }
