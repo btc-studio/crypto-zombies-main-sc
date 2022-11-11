@@ -26,7 +26,8 @@ contract ZombieAttack is ZombieHelper {
         uint _zombieId,
         uint amount,
         uint winnerExp,
-        uint loserExp
+        uint loserExp,
+        Dna dnaSample
     );
 
     constructor(address _token) ZombieHelper(_token) {}
@@ -208,11 +209,13 @@ contract ZombieAttack is ZombieHelper {
         // TODO: Need a mechanism to ensure the reward for user when SC is out of BTCS Token
         sendReward(ownerOf(winnerZombieId), AMOUNT_REWARD * 10**uint256(18));
 
+        Dna memory dnaSample;
         // If the user wins -> Have a chance of 0.1% to get a DNA Sample
         if (_zombieId == winnerZombieId) {
             uint rand = randMod(1000);
-            if (rand < 1) {
-                generateDnaSample(ownerOf(_zombieId));
+            // TODO: change 500 to 1
+            if (rand < 500) {
+                dnaSample = generateDnaSample(ownerOf(_zombieId));
             }
         }
 
@@ -220,7 +223,13 @@ contract ZombieAttack is ZombieHelper {
         internalLevelUp(_zombieId);
         internalLevelUp(_targetId);
 
-        emit RewardUser(winnerZombieId, AMOUNT_REWARD, winnerExp, loserExp);
+        emit RewardUser(
+            winnerZombieId,
+            AMOUNT_REWARD,
+            winnerExp,
+            loserExp,
+            dnaSample
+        );
     }
 
     // Winner: EXP = 50 + 5*(level-1)
