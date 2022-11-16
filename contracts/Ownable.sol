@@ -37,32 +37,10 @@ contract Ownable {
      * @dev Allows the current owner to transfer control of the contract to a newOwner.
      * @param newOwner The address to transfer ownership to.
      */
-    function transferOwnership(address newOwner) public onlyOwner {
+    function transferOwnership(address newOwner) external onlyOwner {
         require(newOwner != address(0));
         emit OwnershipTransferred(owner, newOwner);
         owner = newOwner;
-    }
-
-     // Modifier to check _token allowance
-    modifier checkAllowance(uint amount) {
-        require(token.allowance(msg.sender, address(this)) >= amount, "Error");
-        _;
-    }
-
-    function getName() external view returns (string memory){
-        return token.name();
-    }
-
-    function getTotalSupply() external view returns (uint256){
-        return token.totalSupply();
-    }
-    
-    function getBalanceOf(address _owner) external view returns (uint256){
-        return token.balanceOf(_owner);
-    }
-
-    function getBalance() external view returns (uint256){
-        return token.balanceOf(address(this));
     }
 
     function sendReward(address _to, uint256 _value) internal {

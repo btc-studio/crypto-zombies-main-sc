@@ -4,8 +4,6 @@ pragma solidity ^0.8.16;
 import "./ZombieFeeding.sol";
 
 contract ZombieHelper is ZombieFeeding {
-    using SafeMath for uint256;
-    using SafeMath32 for uint32;
     using SafeMath16 for uint16;
 
     constructor(address _token) ZombieFeeding(_token) {}
@@ -14,10 +12,6 @@ contract ZombieHelper is ZombieFeeding {
 
     function withdraw() external onlyOwner {
         payable(owner).transfer(address(this).balance);
-    }
-
-    function _isNotOnlyOwner() internal view returns (bool) {
-        return _getNumberZombiesOfOwner(msg.sender) != zombieCount;
     }
 
     function _getNumberZombiesOfOwner(address _owner)
@@ -36,16 +30,11 @@ contract ZombieHelper is ZombieFeeding {
         return count;
     }
 
-    function changeZombieName(uint _zombieId, string memory _name)
-        public
-        requireAlphanumeric(_name)
-        requireMaxLengthASCII(_name, 16)
-        requireMinLengthASCII(_name, 1)
-    {
-        require(
-            ownerOf(_zombieId) == msg.sender,
-            "Only owner of the Zombie can change it's name"
-        );
+    function changeZombieName(uint _zombieId, string memory _name) external {
+        require(ownerOf(_zombieId) == msg.sender, "OW_ZB");
+        require(checkAlphanumeric(_name), "STR_ALPHANUMERIC");
+        require(checkMaxLengthASCII(_name, 16), "STR_MAX");
+        require(checkMinLengthASCII(_name, 1), "STR_MIN");
 
         zombies[_zombieId].name = _name;
 
@@ -53,8 +42,8 @@ contract ZombieHelper is ZombieFeeding {
     }
 
     // private method
-    function _checkCrit(uint32 _criticalRate) internal returns (uint32) {
-        uint32 randomSeed = uint32(randMod(10001));
+    function _checkCrit(uint16 _criticalRate) internal returns (uint16) {
+        uint16 randomSeed = uint16(randMod(10001));
         if (randomSeed <= _criticalRate.mul(100).div(10)) {
             return 1;
         } else {
@@ -62,7 +51,7 @@ contract ZombieHelper is ZombieFeeding {
         }
     }
 
-    function checkAlphanumeric(string memory str) private pure returns (bool) {
+    function checkAlphanumeric(string memory str) internal pure returns (bool) {
         bytes memory b = bytes(str);
 
         if (b.length > 0) {
@@ -88,7 +77,7 @@ contract ZombieHelper is ZombieFeeding {
     }
 
     function checkMinLengthASCII(string memory str, uint8 minLength)
-        private
+        internal
         pure
         returns (bool)
     {
@@ -101,7 +90,7 @@ contract ZombieHelper is ZombieFeeding {
     }
 
     function checkMaxLengthASCII(string memory str, uint8 maxLength)
-        private
+        internal
         pure
         returns (bool)
     {
@@ -111,26 +100,5 @@ contract ZombieHelper is ZombieFeeding {
         }
 
         return true;
-    }
-
-    modifier requireAlphanumeric(string memory str) {
-        require(checkAlphanumeric(str), "String must be alphanumeric");
-        _;
-    }
-
-    modifier requireMaxLengthASCII(string memory str, uint8 maxLength) {
-        require(
-            checkMaxLengthASCII(str, maxLength),
-            "String must be has length less than or equal maxLength"
-        );
-        _;
-    }
-
-    modifier requireMinLengthASCII(string memory str, uint8 minLength) {
-        require(
-            checkMinLengthASCII(str, minLength),
-            "String must be has length greater than or equal minLength"
-        );
-        _;
     }
 }

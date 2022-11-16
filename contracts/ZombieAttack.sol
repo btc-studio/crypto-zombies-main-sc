@@ -6,7 +6,6 @@ import "./SafeMath.sol";
 
 contract ZombieAttack is ZombieHelper {
     using SafeMath for uint256;
-    using SafeMath32 for uint32;
     using SafeMath16 for uint16;
 
     struct FightScriptStruct {
@@ -32,9 +31,9 @@ contract ZombieAttack is ZombieHelper {
 
     constructor(address _token) ZombieHelper(_token) {}
 
-    function findBattle(uint _zombieId) public view returns (uint) {
+    function findBattle(uint _zombieId) external view returns (uint) {
         // If there is only 1 address has zombie in the SC -> Return error
-        require(_isNotOnlyOwner());
+        require(_getNumberZombiesOfOwner(msg.sender) != zombieCount);
 
         // Find Zombie
         uint _targetId = findRandomZombie(_zombieId);
@@ -215,7 +214,7 @@ contract ZombieAttack is ZombieHelper {
             uint rand = randMod(1000);
             // TODO: change 500 to 1
             if (rand < 500) {
-                dnaSample = generateDnaSample(ownerOf(_zombieId));
+                dnaSample = _generateDnaSample(ownerOf(_zombieId));
             }
         }
 

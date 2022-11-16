@@ -17,9 +17,9 @@ describe("DnaBase", function () {
   describe("Zombie Helper", function () {
     beforeEach(async function () {
       // addr1 creates 3 random DNAs
-      await nft.connect(addr1).openStarterPack();
+      await nft.connect(addr1).openStarterPack("user");
       // addr2 creates 3 random DNAs
-      await nft.connect(addr2).openStarterPack();
+      await nft.connect(addr2).openStarterPack("user");
     });
 
     it("Should change name of the Zombie", async function () {
@@ -33,37 +33,29 @@ describe("DnaBase", function () {
     it("Should fail if the account change the Zombie name is not the owner of the Zombie", async function () {
       await expect(
         nft.connect(addr2).changeZombieName(4, "Zuong Fail")
-      ).to.be.revertedWith("Only owner of the Zombie can change it's name");
+      ).to.be.revertedWith("OW_ZB");
     });
 
     it("Should fail if the new name of the Zombie is empty", async function () {
-      await expect(
-        nft.connect(addr1).changeZombieName(4, "")
-      ).to.be.reverted;
+      await expect(nft.connect(addr1).changeZombieName(4, "")).to.be.reverted;
     });
 
     it("Should fail if the new name of the Zombie has an invalid character", async function () {
-      await expect(
-        nft.connect(addr1).changeZombieName(4, "Zuong!")
-      ).to.be.reverted;
+      await expect(nft.connect(addr1).changeZombieName(4, "Zuong!")).to.be
+        .reverted;
     });
 
     it("Should fail if the new name of the Zombie has a space at tail", async function () {
-      await expect(
-        nft.connect(addr1).changeZombieName(4, "Z ")
-      ).to.be.reverted;
+      await expect(nft.connect(addr1).changeZombieName(4, "Z ")).to.be.reverted;
     });
 
     it("Should fail if the new name of the Zombie is a space", async function () {
-      await expect(
-        nft.connect(addr1).changeZombieName(4, " ")
-      ).to.be.reverted;
+      await expect(nft.connect(addr1).changeZombieName(4, " ")).to.be.reverted;
     });
 
     it("Should fail if the new name of the Zombie has length greater than 16", async function () {
-      await expect(
-        nft.connect(addr1).changeZombieName(4, "12345678912345678")
-      ).to.be.reverted;
+      await expect(nft.connect(addr1).changeZombieName(4, "12345678912345678"))
+        .to.be.reverted;
     });
   });
 });

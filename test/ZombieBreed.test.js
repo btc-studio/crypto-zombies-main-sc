@@ -23,7 +23,7 @@ describe("ZombieBreed", function () {
   describe("Breed", function () {
     beforeEach(async function () {
       // addr1 creates 3 random DNAs
-      await nft.connect(addr1).openStarterPack();
+      await nft.connect(addr1).openStarterPack("user");
     });
 
     it("Should fail because of not enough level", async function () {

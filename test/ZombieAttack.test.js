@@ -23,9 +23,9 @@ describe("ZombieAttack", function () {
   describe("Attack", function () {
     beforeEach(async function () {
       // addr1 creates 3 random DNAs
-      await nft.connect(addr1).openStarterPack();
+      await nft.connect(addr1).openStarterPack("user");
       // addr2 creates 3 random DNAs
-      await nft.connect(addr2).openStarterPack();
+      await nft.connect(addr2).openStarterPack("user");
     });
 
     it("Should find battle and attack zombies", async function () {

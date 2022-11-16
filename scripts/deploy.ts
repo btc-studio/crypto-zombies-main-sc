@@ -7,16 +7,23 @@ async function main() {
   const [deployer] = await ethers.getSigners();
   console.log("deploy from address: ", deployer.address);
 
-  const tokenContract = "0x5C04B8257C62B77165Ff8025e285B0D2a2cf42Be";
+  const oldTokenContract = "0x3986C657C4597064825b4eaeC2FFac4fc501644f";
+  const newTokenContract = "0x3986C657C4597064825b4eaeC2FFac4fc501644f";
+  const oldCryptoZombieContract = "0xf509F36574B0Fc25f8D855d97685B3D5D8419a22";
 
-  console.log("BTCS token contract address: ", tokenContract);
+  console.log("Old BTCS token contract address: ", oldTokenContract);
+  console.log("New BTCS token contract address: ", newTokenContract);
   // Set BTCS token contract address to config.json
-  Config.setConfig(network + ".btcs", tokenContract);
+  Config.setConfig(network + ".btcs", newTokenContract);
 
   // --------------------------------------------------------------------
   // GiftPack is the leaf in Smart Contract's hierarchical
-  const CryptoZombie = await ethers.getContractFactory("GiftPack");
-  const cryptoZombie = await CryptoZombie.deploy(tokenContract);
+  const CryptoZombie = await ethers.getContractFactory("Migrator");
+  const cryptoZombie = await CryptoZombie.deploy(
+    oldTokenContract,
+    newTokenContract,
+    oldCryptoZombieContract
+  );
   await cryptoZombie.deployed();
   console.log("CryptoZombie contract address: ", cryptoZombie.address);
   // Set CryptoZombie contract address to config.json

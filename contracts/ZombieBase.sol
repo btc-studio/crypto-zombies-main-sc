@@ -13,7 +13,6 @@ uint constant AMOUNT_REWARD = 10;
 
 contract ZombieBase is DnaBase {
     using SafeMath for uint256;
-    using SafeMath32 for uint32;
     using SafeMath16 for uint16;
 
     uint public tokenCount;
@@ -28,24 +27,23 @@ contract ZombieBase is DnaBase {
         uint id;
         string name;
         uint dna;
-        uint32 level;
-        uint32 readyTime;
+        uint16 level;
         uint16 winCount;
         uint16 lossCount;
         uint16 breedCount;
         Sex sex;
-        uint32 healthPoint;
-        uint32 attack;
-        uint32 defense;
-        uint32 criticalRate;
-        uint32 criticalDamage;
-        uint32 speed;
-        uint32 combatPower;
+        uint16 healthPoint;
+        uint16 attack;
+        uint16 defense;
+        uint16 criticalRate;
+        uint16 criticalDamage;
+        uint16 speed;
+        uint16 combatPower;
         string rarity;
         uint exp;
     }
 
-    uint32[] public EXP_UP_LEVEL = [
+    uint16[] internal EXP_UP_LEVEL = [
         8,
         280,
         742,
@@ -81,7 +79,7 @@ contract ZombieBase is DnaBase {
         rarityToGrowStat["SSS"] = 20;
     }
 
-    function getZombieOf(address _owner) public view returns (Zombie[] memory) {
+    function getZombieOf(address _owner) external view returns (Zombie[] memory) {
         uint ownerZombieCount = 0;
         for (uint i = 0; i < zombieCount; i += 1) {
             if (ownerOf(zombiesKeys[i]) == _owner) {
@@ -101,7 +99,7 @@ contract ZombieBase is DnaBase {
         return ownerZombies;
     }
 
-    function getDnaOf(address _owner) public view returns (Dna[] memory) {
+    function getDnaOf(address _owner) external view returns (Dna[] memory) {
         uint ownerDnaCount = 0;
         for (uint i = 0; i < dnaCount; i += 1) {
             if (ownerOf(dnasKeys[i]) == _owner) {
@@ -159,7 +157,7 @@ contract ZombieBase is DnaBase {
             // Increase random stats with random amount
             uint totalGrowPoint = rarityToGrowStat[zombies[_zombieId].rarity];
             zombies[_zombieId].combatPower = zombies[_zombieId].combatPower.add(
-                uint32(totalGrowPoint)
+                uint16(totalGrowPoint)
             );
 
             uint8 loopCount = 0;
@@ -201,41 +199,41 @@ contract ZombieBase is DnaBase {
                     ) {
                         zombies[_zombieId].healthPoint = zombies[_zombieId]
                             .healthPoint
-                            .add(uint32(randomStatAmount));
+                            .add(uint16(randomStatAmount));
                     } else if (
                         keccak256(abi.encodePacked(randomStat)) ==
                         keccak256(abi.encodePacked("attack"))
                     ) {
                         zombies[_zombieId].attack = zombies[_zombieId]
                             .attack
-                            .add(uint32(randomStatAmount));
+                            .add(uint16(randomStatAmount));
                     } else if (
                         keccak256(abi.encodePacked(randomStat)) ==
                         keccak256(abi.encodePacked("defense"))
                     ) {
                         zombies[_zombieId].defense = zombies[_zombieId]
                             .defense
-                            .add(uint32(randomStatAmount));
+                            .add(uint16(randomStatAmount));
                     } else if (
                         keccak256(abi.encodePacked(randomStat)) ==
                         keccak256(abi.encodePacked("criticalRate"))
                     ) {
                         zombies[_zombieId].criticalRate = zombies[_zombieId]
                             .criticalRate
-                            .add(uint32(randomStatAmount));
+                            .add(uint16(randomStatAmount));
                     } else if (
                         keccak256(abi.encodePacked(randomStat)) ==
                         keccak256(abi.encodePacked("criticalDamage"))
                     ) {
                         zombies[_zombieId].criticalDamage = zombies[_zombieId]
                             .criticalDamage
-                            .add(uint32(randomStatAmount));
+                            .add(uint16(randomStatAmount));
                     } else if (
                         keccak256(abi.encodePacked(randomStat)) ==
                         keccak256(abi.encodePacked("speed"))
                     ) {
                         zombies[_zombieId].speed = zombies[_zombieId].speed.add(
-                            uint32(randomStatAmount)
+                            uint16(randomStatAmount)
                         );
                     }
 

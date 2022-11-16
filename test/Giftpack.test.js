@@ -29,13 +29,13 @@ describe("GiftPack", () => {
     });
 
     it("Should openStarterPack without error", async () => {
-      expect(await mainSmartContract.connect(addr1).openStarterPack()).to.not.be
-        .undefined;
+      expect(await mainSmartContract.connect(addr1).openStarterPack("user")).to
+        .not.be.undefined;
     });
 
     it("Should return true if wallet already opened starter pack", async () => {
-      await mainSmartContract.connect(addr1).openStarterPack();
-      await mainSmartContract.connect(addr2).openStarterPack();
+      await mainSmartContract.connect(addr1).openStarterPack("user");
+      await mainSmartContract.connect(addr2).openStarterPack("user");
       const isOpenStarterPack = await mainSmartContract.checkOpenStarterPack(
         addr1.address
       );
@@ -43,12 +43,19 @@ describe("GiftPack", () => {
     });
 
     it("Should throw error openStarterPack if wallet already opened starter pack", async () => {
-      await mainSmartContract.connect(addr1).openStarterPack();
+      await mainSmartContract.connect(addr1).openStarterPack("user");
       try {
-        await mainSmartContract.connect(addr1).openStarterPack();
+        await mainSmartContract.connect(addr1).openStarterPack("user");
       } catch (err) {
         expect(err).to.not.be.undefined;
       }
+    });
+
+    it("Should create new user", async () => {
+      await mainSmartContract.connect(addr1).openStarterPack("user");
+      const user = await mainSmartContract.users(1);
+      expect(user.name).to.equal("user");
+      expect(user.walletAddress).to.equal(addr1.address);
     });
   });
 });

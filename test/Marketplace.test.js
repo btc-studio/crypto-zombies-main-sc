@@ -40,9 +40,9 @@ describe("NFTMarketplace", function () {
   describe("Minting NFTs", function () {
     beforeEach(async function () {
       // addr1 creates 3 random DNAs
-      await nft.connect(addr1).openStarterPack();
+      await nft.connect(addr1).openStarterPack("user");
       // addr2 creates 3 random DNAs
-      await nft.connect(addr2).openStarterPack();
+      await nft.connect(addr2).openStarterPack("user");
     });
 
     it("Should track each minted NFT", async function () {
@@ -58,7 +58,7 @@ describe("NFTMarketplace", function () {
   describe("Making marketplace item", function () {
     beforeEach(async function () {
       // addr1 creates 3 random DNAs
-      await nft.connect(addr1).openStarterPack();
+      await nft.connect(addr1).openStarterPack("user");
       // addr1 approve marketplace to spend nft
       await nft.connect(addr1).setApprovalForAll(marketplace.address, true);
     });
@@ -96,7 +96,7 @@ describe("NFTMarketplace", function () {
   describe("Remove items from marketplace", function () {
     beforeEach(async function () {
       // addr1 creates 3 random DNAs
-      await nft.connect(addr1).openStarterPack();
+      await nft.connect(addr1).openStarterPack("user");
       // addr1 approve marketplace to spend nft
       await nft.connect(addr1).setApprovalForAll(marketplace.address, true);
       // addr1 makes their nft a marketplace item
@@ -129,7 +129,7 @@ describe("NFTMarketplace", function () {
     let totalPriceInWei;
     beforeEach(async function () {
       // addr1 mints an nft
-      await nft.connect(addr1).openStarterPack();
+      await nft.connect(addr1).openStarterPack("user");
       // addr1 approve marketplace to spend nft
       await nft.connect(addr1).setApprovalForAll(marketplace.address, true);
       // addr1 makes their nft a marketplace item

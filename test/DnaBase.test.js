@@ -17,9 +17,9 @@ describe("DnaBase", function () {
   describe("DNA Sample", function () {
     beforeEach(async function () {
       // addr1 creates 3 random DNAs
-      await nft.connect(addr1).openStarterPack();
+      await nft.connect(addr1).openStarterPack("user");
       // addr2 creates 3 random DNAs
-      await nft.connect(addr2).openStarterPack();
+      await nft.connect(addr2).openStarterPack("user");
     });
 
     it("Should create 3 new DNA and instantly open it for user", async function () {
@@ -33,14 +33,6 @@ describe("DnaBase", function () {
       // After open DNA Sample -> dna should be removed from mapping (which mean everything turns to 0)
       const openedDna = await nft.dnas(1);
       expect(openedDna.id).to.equal(0);
-    });
-
-    it("Should fail if the account opens the DNA is not the owner", async function () {
-      await nft.connect(addr1).generateDnaSample(addr1.address);
-      const dna = await nft.dnas(13);
-      await expect(nft.connect(addr2).openDna(dna.id)).to.be.revertedWith(
-        "Only owner of the DNA can open it"
-      );
     });
   });
 });
