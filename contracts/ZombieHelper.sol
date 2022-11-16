@@ -11,14 +11,12 @@ contract ZombieHelper is ZombieFeeding {
     event ZombieNameChanged(uint _zombieId, string newName);
 
     function withdraw() external onlyOwner {
-        payable(owner).transfer(address(this).balance);
+        token.transfer(owner, token.balanceOf(address(this)));
     }
 
-    function _getNumberZombiesOfOwner(address _owner)
-        internal
-        view
-        returns (uint)
-    {
+    function _getNumberZombiesOfOwner(
+        address _owner
+    ) internal view returns (uint) {
         uint count = 0;
 
         for (uint index = 0; index < zombieCount; index += 1) {
@@ -76,11 +74,10 @@ contract ZombieHelper is ZombieFeeding {
         return true;
     }
 
-    function checkMinLengthASCII(string memory str, uint8 minLength)
-        internal
-        pure
-        returns (bool)
-    {
+    function checkMinLengthASCII(
+        string memory str,
+        uint8 minLength
+    ) internal pure returns (bool) {
         bytes memory b = bytes(str);
         if (b.length < minLength) {
             return false;
@@ -89,11 +86,10 @@ contract ZombieHelper is ZombieFeeding {
         return true;
     }
 
-    function checkMaxLengthASCII(string memory str, uint8 maxLength)
-        internal
-        pure
-        returns (bool)
-    {
+    function checkMaxLengthASCII(
+        string memory str,
+        uint8 maxLength
+    ) internal pure returns (bool) {
         bytes memory b = bytes(str);
         if (b.length > maxLength) {
             return false;
