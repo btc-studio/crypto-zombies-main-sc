@@ -41,10 +41,10 @@ contract ZombieAttack is ZombieHelper {
         return _targetId;
     }
 
-    function attack(uint _zombieId, uint _targetId)
-        external
-        onlyOwnerOf(_zombieId)
-    {
+    function attack(
+        uint _zombieId,
+        uint _targetId
+    ) external onlyOwnerOf(_zombieId) {
         Zombie storage myZombie = zombies[_zombieId];
         Zombie storage enemyZombie = zombies[_targetId];
 
@@ -206,7 +206,7 @@ contract ZombieAttack is ZombieHelper {
 
         // Reward BTCS Token if the Smart Contract has enough BTCS
         // TODO: Need a mechanism to ensure the reward for user when SC is out of BTCS Token
-        sendReward(ownerOf(winnerZombieId), AMOUNT_REWARD * 10**uint256(18));
+        sendReward(ownerOf(winnerZombieId), AMOUNT_REWARD * 10 ** uint256(18));
 
         Dna memory dnaSample;
         // If the user wins -> Have a chance of 0.1% to get a DNA Sample
@@ -249,20 +249,22 @@ contract ZombieAttack is ZombieHelper {
         uint currentHP
     ) internal returns (uint) {
         if (
-            ((100 * attackZombie.attack) / defenseZombie.defense + 200) *
-                (1 +
-                    ((attackZombie.criticalDamage * 15) / 100 - 1) *
-                    _checkCrit(attackZombie.criticalRate)) >=
+            (((100 * attackZombie.attack) / defenseZombie.defense + 200) *
+                (10 +
+                    ((attackZombie.criticalDamage * 150) / 100 - 10) *
+                    _checkCrit(attackZombie.criticalRate))) /
+                10 >=
             currentHP
         ) {
             currentHP = 0;
         } else {
             currentHP =
                 currentHP -
-                ((100 * attackZombie.attack) / defenseZombie.defense + 200) *
-                (1 +
-                    ((attackZombie.criticalDamage * 15) / 100 - 1) *
-                    _checkCrit(attackZombie.criticalRate));
+                (((100 * attackZombie.attack) / defenseZombie.defense + 200) *
+                    (10 +
+                        ((attackZombie.criticalDamage * 150) / 100 - 10) *
+                        _checkCrit(attackZombie.criticalRate))) /
+                10;
         }
 
         return currentHP;
@@ -275,24 +277,32 @@ contract ZombieAttack is ZombieHelper {
     ) internal returns (uint, FightScriptStruct memory) {
         uint isCrit = _checkCrit(attackZombie.criticalRate);
         if (
-            ((100 * attackZombie.attack) / defenseZombie.defense + 200) *
-                (1 + ((attackZombie.criticalDamage * 15) / 100 - 1) * isCrit) >=
+            (((100 * attackZombie.attack) / defenseZombie.defense + 200) *
+                (10 +
+                    ((attackZombie.criticalDamage * 150) / 100 - 10) *
+                    isCrit)) /
+                10 >=
             currentHP
         ) {
             currentHP = 0;
         } else {
             currentHP =
                 currentHP -
-                ((100 * attackZombie.attack) / defenseZombie.defense + 200) *
-                (1 + ((attackZombie.criticalDamage * 15) / 100 - 1) * isCrit);
+                (((100 * attackZombie.attack) / defenseZombie.defense + 200) *
+                    (10 +
+                        ((attackZombie.criticalDamage * 150) / 100 - 10) *
+                        isCrit)) /
+                10;
         }
 
         // Update fightScripts
         FightScriptStruct memory fightScript = FightScriptStruct(
             attackZombie.id,
             isCrit,
-            ((100 * attackZombie.attack) / defenseZombie.defense + 200) *
-                (1 + ((attackZombie.criticalDamage * 15) / 100 - 1) * isCrit),
+            (((100 * attackZombie.attack) / defenseZombie.defense + 200) *
+                (10 +
+                    ((attackZombie.criticalDamage * 150) / 100 - 10) *
+                    isCrit)) / 10,
             currentHP
         );
 

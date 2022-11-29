@@ -1,8 +1,8 @@
 {
   "dev": {},
   "bsctest": {
-    "cryptoZombie": "0xa092907133b51DCaCaB8E4e7F05f356a122BC6Fb",
-    "marketplace": "0xe410A927A31Ce43EF192aADeDF1f6FBa0C8F260b",
+    "cryptoZombie": "0x2d193fa051844bAED030786AA436D77dEA9A353A",
+    "marketplace": "0x10A7B1a4a279d904A9872DbdEd32b82d9B5e505f",
     "btcs": "0x3986C657C4597064825b4eaeC2FFac4fc501644f"
   },
   "rinkeby": {},
