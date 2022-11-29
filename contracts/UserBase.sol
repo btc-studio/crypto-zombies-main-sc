@@ -18,7 +18,6 @@ contract UserBase is Ownable {
 
     struct User {
         uint id;
-        string name;
         address walletAddress;
         uint16 level;
         uint256 exp;
@@ -48,7 +47,7 @@ contract UserBase is Ownable {
 
     mapping(address => User) ownerInfos;
 
-    event UserCreated(address sender, string name, uint8 level);
+    event UserCreated(address sender, uint8 level);
     event UserLevelUp(address sender, uint16 oldLevel, uint16 newLevel);
 
     constructor(address _token) Ownable(_token) {}
@@ -56,28 +55,18 @@ contract UserBase is Ownable {
     /**
      *  @dev create new user
      *  @param _creator creator's address of the user
-     *  @param _name name of the user
      *  @return user
      */
-    function _createUser(address _creator, string memory _name)
-        internal
-        returns (User memory)
-    {
+    function _createUser(address _creator) internal returns (User memory) {
         userCount++;
 
         uint id = userCount;
-        User memory user = User(
-            id,
-            _name,
-            _creator,
-            USER_START_LEVEL,
-            USER_START_EXP
-        );
+        User memory user = User(id, _creator, USER_START_LEVEL, USER_START_EXP);
 
         users[id] = user;
         ownerInfos[_creator] = user;
 
-        emit UserCreated(_creator, _name, USER_START_LEVEL);
+        emit UserCreated(_creator, USER_START_LEVEL);
 
         return user;
     }

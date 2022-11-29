@@ -248,11 +248,12 @@ contract ZombieAttack is ZombieHelper {
         Zombie storage defenseZombie,
         uint currentHP
     ) internal returns (uint) {
+        uint isCrit = _checkCrit(attackZombie.criticalRate);
         if (
             (((100 * attackZombie.attack) / defenseZombie.defense + 200) *
                 (10 +
                     ((attackZombie.criticalDamage * 150) / 100 - 10) *
-                    _checkCrit(attackZombie.criticalRate))) /
+                    isCrit)) /
                 10 >=
             currentHP
         ) {
@@ -263,7 +264,7 @@ contract ZombieAttack is ZombieHelper {
                 (((100 * attackZombie.attack) / defenseZombie.defense + 200) *
                     (10 +
                         ((attackZombie.criticalDamage * 150) / 100 - 10) *
-                        _checkCrit(attackZombie.criticalRate))) /
+                        isCrit)) /
                 10;
         }
 

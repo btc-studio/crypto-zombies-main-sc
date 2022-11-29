@@ -17,9 +17,9 @@ describe("DnaBase", function () {
   describe("DNA Sample", function () {
     beforeEach(async function () {
       // addr1 creates 3 random DNAs
-      await nft.connect(addr1).openStarterPack("user");
+      await nft.connect(addr1).openStarterPack();
       // addr2 creates 3 random DNAs
-      await nft.connect(addr2).openStarterPack("user");
+      await nft.connect(addr2).openStarterPack();
     });
 
     it("Should create 3 new DNA and instantly open it for user", async function () {

@@ -11,19 +11,21 @@ contract Migrator is GiftPack {
     GiftPack public oldNftContract;
     address oldFtContractAddress;
     address newFtContractAddress;
+    address oldNftContractAddress;
     bool public isMigrated;
 
     // ======================== Implement ========================
-    constructor(
-        address _oldFt,
-        address _newFt,
-        address _oldNft
-    ) GiftPack(_newFt) {
+    constructor(address _token) GiftPack(_token) {}
+
+    function setFtContract(address _oldFt, address _newFt) public {
         oldFtContract = ERC20(_oldFt);
         newFtContract = ERC20(_newFt);
-        oldNftContract = GiftPack(_oldNft);
         oldFtContractAddress = _oldFt;
         newFtContractAddress = _newFt;
+    }
+
+    function setNftContract(address _oldNft) public {
+        oldNftContract = GiftPack(_oldNft);
     }
 
     function migrateData() public {
@@ -40,12 +42,11 @@ contract Migrator is GiftPack {
         for (uint i = 1; i <= userCount; i++) {
             (
                 uint id,
-                string memory name,
                 address walletAddress,
                 uint16 level,
                 uint256 exp
             ) = oldNftContract.users(i);
-            users[i] = User(id, name, walletAddress, level, exp);
+            users[i] = User(id, walletAddress, level, exp);
         }
 
         // --- Token ---

@@ -26,14 +26,22 @@ describe("Migrator", () => {
     );
 
     newMainSmartContract = await migratorContractFactory.deploy(
-      btcsContract.address,
-      btcsContract.address,
-      oldMainSmartContract.address
+      btcsContract.address
+      // btcsContract.address,
+      // oldMainSmartContract.address
     );
   });
 
   describe("Migrate", function () {
     beforeEach(async function () {
+      // Set FT/NFT Versions to migrate data
+      await newMainSmartContract.setFtContract(
+        btcsContract.address,
+        btcsContract.address
+      );
+      await newMainSmartContract.setNftContract(oldMainSmartContract.address);
+
+      // Migrate data
       await newMainSmartContract.connect(deployer).migrateData();
     });
 

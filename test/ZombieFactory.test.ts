@@ -24,7 +24,7 @@ describe("ZombieFactory", function () {
         deployOneYearLockFixture
       );
 
-      await zombieFactory.connect(addr1).openStarterPack("user");
+      await zombieFactory.connect(addr1).openStarterPack();
       const zombie = await zombieFactory.zombies(4);
       const zombies = await zombieFactory.getZombieOf(addr1.address);
       expect(zombies.length).to.equal(3);

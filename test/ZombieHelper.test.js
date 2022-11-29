@@ -17,9 +17,9 @@ describe("DnaBase", function () {
   describe("Zombie Helper", function () {
     beforeEach(async function () {
       // addr1 creates 3 random DNAs
-      await nft.connect(addr1).openStarterPack("user");
+      await nft.connect(addr1).openStarterPack();
       // addr2 creates 3 random DNAs
-      await nft.connect(addr2).openStarterPack("user");
+      await nft.connect(addr2).openStarterPack();
     });
 
     it("Should change name of the Zombie", async function () {
