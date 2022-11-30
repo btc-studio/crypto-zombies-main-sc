@@ -27,11 +27,6 @@ describe("Migrator", () => {
 
     newMainSmartContract = await migratorContractFactory.deploy(
       btcsContract.address
-<<<<<<< HEAD
-=======
-      // btcsContract.address,
-      // oldMainSmartContract.address
->>>>>>> 46472c8... Remove user's name
     );
   });
 
