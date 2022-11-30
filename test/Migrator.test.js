@@ -27,8 +27,6 @@ describe("Migrator", () => {
 
     newMainSmartContract = await migratorContractFactory.deploy(
       btcsContract.address
-      // btcsContract.address,
-      // oldMainSmartContract.address
     );
   });
 
