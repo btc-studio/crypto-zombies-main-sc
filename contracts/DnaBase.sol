@@ -5,7 +5,6 @@ import "./UserBase.sol";
 
 contract DnaBase is UserBase, ERC721 {
     using SafeMath for uint256;
-    using SafeMath32 for uint32;
     using SafeMath16 for uint16;
 
     uint dnaDigits = 16;

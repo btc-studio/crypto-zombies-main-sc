@@ -3,30 +3,8 @@ pragma solidity ^0.8.16;
 
 import "./ZombieFactory.sol";
 
-abstract contract KittyInterface {
-    function getKitty(uint256 _id)
-        external
-        view
-        virtual
-        returns (
-            bool isGestating,
-            bool isReady,
-            uint256 cooldownIndex,
-            uint256 nextActionAt,
-            uint256 siringWithId,
-            uint256 birthTime,
-            uint256 matronId,
-            uint256 sireId,
-            uint256 generation,
-            uint256 genes
-        );
-}
-
 contract ZombieFeeding is ZombieFactory {
-    KittyInterface kittyContract;
-
     using SafeMath for uint256;
-    using SafeMath32 for uint32;
     using SafeMath16 for uint16;
 
     modifier onlyOwnerOf(uint _zombieId) {
@@ -36,26 +14,6 @@ contract ZombieFeeding is ZombieFactory {
 
     constructor(address _token) ZombieFactory(_token) {}
 
-    function _triggerCooldown(Zombie storage _zombie) internal {
-        _zombie.readyTime = uint32(block.timestamp + cooldownTime);
-    }
-
-    function _isReady(Zombie storage _zombie) internal view returns (bool) {
-        return (_zombie.readyTime <= block.timestamp);
-    }
-
-    function _isCanBreed(Zombie storage _zombie) internal view returns (bool) {
-        return (_zombie.level >= LVL_CAN_BREED &&
-            _zombie.breedCount < MAX_BREEDING_POINTS);
-    }
-
-    function _stringNotEmptyOrNull(string memory input)
-        internal
-        pure
-        returns (bool)
-    {
-        return bytes(input).length > 0;
-    }
 
     function _generateDna(
         uint dna1,
@@ -73,7 +31,7 @@ contract ZombieFeeding is ZombieFactory {
         uint _fatherId,
         uint _motherId,
         string memory _name
-    ) public onlyOwnerOf(_fatherId) onlyOwnerOf(_motherId) {
+    ) external onlyOwnerOf(_fatherId) onlyOwnerOf(_motherId) {
         Zombie storage father = zombies[_fatherId];
         Zombie storage mother = zombies[_motherId];
 
@@ -82,9 +40,15 @@ contract ZombieFeeding is ZombieFactory {
         string memory zombieRarity = _randomZombieRarity(dnaRarity);
 
         // Check conditions
-        require(_isCanBreed(father));
-        require(_isCanBreed(mother));
-        require(_stringNotEmptyOrNull(_name));
+        require(
+            father.level >= LVL_CAN_BREED &&
+                father.breedCount < MAX_BREEDING_POINTS
+        );
+        require(
+            mother.level >= LVL_CAN_BREED &&
+                mother.breedCount < MAX_BREEDING_POINTS
+        );
+        require(bytes(_name).length > 0);
         require(father.sex != mother.sex);
 
         // Increase breed Count

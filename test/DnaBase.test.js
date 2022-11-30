@@ -34,13 +34,5 @@ describe("DnaBase", function () {
       const openedDna = await nft.dnas(1);
       expect(openedDna.id).to.equal(0);
     });
-
-    it("Should fail if the account opens the DNA is not the owner", async function () {
-      await nft.connect(addr1).generateDnaSample(addr1.address);
-      const dna = await nft.dnas(13);
-      await expect(nft.connect(addr2).openDna(dna.id)).to.be.revertedWith(
-        "Only owner of the DNA can open it"
-      );
-    });
   });
 });

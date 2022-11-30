@@ -11,17 +11,19 @@ uint8 constant USER_MAX_LEVEL_CAP = 20;
 
 contract UserBase is Ownable {
     using SafeMath for uint256;
-    using SafeMath32 for uint32;
     using SafeMath16 for uint16;
-    using SafeMath8 for uint8;
+
+    uint public userCount;
+    mapping(uint => User) public users;
 
     struct User {
-        string name;
-        uint8 level;
+        uint id;
+        address walletAddress;
+        uint16 level;
         uint256 exp;
     }
 
-    uint32[] USER_EXP_TO_LEVEL_UP = [
+    uint16[] USER_EXP_TO_LEVEL_UP = [
         8,
         280,
         742,
@@ -43,31 +45,28 @@ contract UserBase is Ownable {
         60709
     ];
 
-    User[] public users;
-
     mapping(address => User) ownerInfos;
 
-    event UserCreated(address sender, string name, uint8 level);
-    event UserLevelUp(address sender, uint8 oldLevel, uint8 newLevel);
+    event UserCreated(address sender, uint8 level);
+    event UserLevelUp(address sender, uint16 oldLevel, uint16 newLevel);
 
     constructor(address _token) Ownable(_token) {}
 
     /**
      *  @dev create new user
-     *  @param _creater creater's address of the user
-     *  @param _name name of the user
+     *  @param _creator creator's address of the user
      *  @return user
      */
-    function createUser(address _creater, string memory _name)
-        external
-        returns (User memory)
-    {
-        User memory user = User(_name, USER_START_LEVEL, USER_START_EXP);
+    function _createUser(address _creator) internal returns (User memory) {
+        userCount++;
 
-        users.push(user);
-        ownerInfos[_creater] = user;
+        uint id = userCount;
+        User memory user = User(id, _creator, USER_START_LEVEL, USER_START_EXP);
 
-        emit UserCreated(_creater, _name, USER_START_LEVEL);
+        users[id] = user;
+        ownerInfos[_creator] = user;
+
+        emit UserCreated(_creator, USER_START_LEVEL);
 
         return user;
     }
@@ -80,8 +79,8 @@ contract UserBase is Ownable {
     function _updateUserExp(address _userAddress, uint256 _exp) internal {
         User storage _user = ownerInfos[_userAddress];
         bool isUserLevelUp = false;
-        uint8 userCurrentLevel = _user.level;
-        uint8 userNextLevel = _user.level;
+        uint16 userCurrentLevel = _user.level;
+        uint16 userNextLevel = _user.level;
         // Add exp to the current user
         _user.exp = _user.exp.add(_exp);
         // Update user current level if exp is bypassing the next level cap.

@@ -3,6 +3,7 @@
   "scripts": {
     "test": "hardhat test",
     "deploy": "hardhat run scripts/deploy.ts --network",
+    "deploy-marketplace": "hardhat run scripts/deploy-marketplace.ts --network",
     "verify": "hardhat verify --network",
     "compile": "hardhat compile"
   },
