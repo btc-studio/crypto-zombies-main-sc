@@ -36,7 +36,8 @@ contract ZombieFactory is ZombieBase {
     function _createZombie(
         string memory _name,
         uint _dna,
-        string memory _zombieRarity
+        string memory _zombieRarity,
+        address senderAddress
     ) internal returns (Zombie memory) {
         tokenCount++;
         zombieCount++;
@@ -73,8 +74,8 @@ contract ZombieFactory is ZombieBase {
         // Update zombies keys array to track zombies's ids
         zombiesKeys.push(id);
 
-        _safeMint(msg.sender, tokenCount);
-        emit NewZombie(msg.sender, id, _name, _dna, sex, 1);
+        _safeMint(senderAddress, tokenCount);
+        emit NewZombie(senderAddress, id, _name, _dna, sex, 1);
 
         return zombie;
     }
@@ -103,10 +104,9 @@ contract ZombieFactory is ZombieBase {
      * DNA 2 star: C-20%, B-35%, A-35%, S-7%, SS-2%, SSS-1%
      * DNA 3 star: C-5%, B-10%, A-20%, S-35%, SS-20%, SSS-10%
      */
-    function _randomZombieRarity(uint _dnaRarity)
-        internal
-        returns (string memory)
-    {
+    function _randomZombieRarity(
+        uint _dnaRarity
+    ) internal returns (string memory) {
         // Random from 0 -> 99
         uint rand = randMod(100);
 
@@ -134,17 +134,20 @@ contract ZombieFactory is ZombieBase {
     }
 
     // Only used for openStarterPack()
-    function _createManyDnas(uint count) internal returns (Zombie[] memory) {
+    function _createManyDnas(
+        uint count,
+        address senderAddress
+    ) internal returns (Zombie[] memory) {
         uint i;
         Dna[] memory dnas = new Dna[](count);
         Zombie[] memory zombies = new Zombie[](count);
         for (i = 0; i < count; i += 1) {
-            dnas[i] = _generateDnaSample(msg.sender);
+            dnas[i] = _generateDnaSample(senderAddress);
         }
 
         // Open 3 new generated dnas
         for (i = 0; i < count; i += 1) {
-            zombies[i] = openDna(dnas[i].id);
+            zombies[i] = openDna(dnas[i].id, senderAddress);
         }
 
         return zombies;
@@ -178,17 +181,22 @@ contract ZombieFactory is ZombieBase {
     }
 
     // Open Dna to create zombie
-    function openDna(uint _dnaId) public returns (Zombie memory) {
-        require(
-            msg.sender == ownerOf(_dnaId),
-            "OW_DNA"
-        );
+    function openDna(
+        uint _dnaId,
+        address senderAddress
+    ) public onlyOperator returns (Zombie memory) {
+        require(senderAddress == ownerOf(_dnaId), "OW_DNA");
 
         Dna storage dna = dnas[_dnaId];
         require(dna.isOpened == false, "DNA_OPENED");
 
         string memory zombieRarity = _randomZombieRarity(dna.rarity);
-        Zombie memory zombie = _createZombie("", dna.dna, zombieRarity);
+        Zombie memory zombie = _createZombie(
+            "",
+            dna.dna,
+            zombieRarity,
+            senderAddress
+        );
 
         dnas[_dnaId].isOpened = true;
         delete dnas[_dnaId];

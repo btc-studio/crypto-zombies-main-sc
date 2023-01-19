@@ -28,8 +28,12 @@ contract ZombieHelper is ZombieFeeding {
         return count;
     }
 
-    function changeZombieName(uint _zombieId, string memory _name) external {
-        require(ownerOf(_zombieId) == msg.sender, "OW_ZB");
+    function changeZombieName(
+        uint _zombieId,
+        string memory _name,
+        address senderAddress
+    ) external onlyOperator {
+        require(ownerOf(_zombieId) == senderAddress, "OW_ZB");
         require(checkAlphanumeric(_name), "STR_ALPHANUMERIC");
         require(checkMaxLengthASCII(_name, 16), "STR_MAX");
         require(checkMinLengthASCII(_name, 1), "STR_MIN");

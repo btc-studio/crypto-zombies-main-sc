@@ -59,12 +59,13 @@ contract Marketplace is ReentrancyGuard {
         IERC721 _nft,
         IERC20 _ft,
         uint _tokenId,
-        uint _price
+        uint _price,
+        address senderAddress
     ) external nonReentrant {
         require(_price > 0, "Price must be greater than zero");
         itemCount++;
         // Transfer nft
-        _nft.transferFrom(msg.sender, address(this), _tokenId);
+        _nft.transferFrom(senderAddress, address(this), _tokenId);
         // Add new item to items mapping
         items[itemCount] = Item(
             itemCount,
@@ -72,7 +73,7 @@ contract Marketplace is ReentrancyGuard {
             _ft,
             _tokenId,
             _price,
-            payable(msg.sender),
+            payable(senderAddress),
             false
         );
         // Emit Offered event
@@ -82,19 +83,23 @@ contract Marketplace is ReentrancyGuard {
             address(_ft),
             _tokenId,
             _price,
-            msg.sender
+            senderAddress
         );
     }
 
-    function unmakeItem(IERC721 _nft, uint _itemId) external nonReentrant {
+    function unmakeItem(
+        IERC721 _nft,
+        uint _itemId,
+        address senderAddress
+    ) external nonReentrant {
         Item storage item = items[_itemId];
         require(
-            msg.sender == item.seller,
+            senderAddress == item.seller,
             "Only owner of the NFT can remove item from Marketplace"
         );
 
         // Transfer nft
-        _nft.transferFrom(address(this), msg.sender, item.tokenId);
+        _nft.transferFrom(address(this), senderAddress, item.tokenId);
 
         // Emit Offered event
         emit Unoffered(_itemId, address(_nft), item.tokenId);
@@ -106,7 +111,11 @@ contract Marketplace is ReentrancyGuard {
     /// @notice Buy an NFT on the Marketplace
     /// @param _amount The amount of BTCS user deposit to buy the NFT
     /// @param _itemId The id of the NFT users want to buy on the Market
-    function purchaseItem(uint _amount, uint _itemId) external nonReentrant {
+    function purchaseItem(
+        uint _amount,
+        uint _itemId,
+        address senderAddress
+    ) external nonReentrant {
         uint _totalPrice = getTotalPrice(_itemId);
         Item storage item = items[_itemId];
         require(_itemId > 0 && _itemId <= itemCount, "Item doesn't exist");
@@ -118,9 +127,9 @@ contract Marketplace is ReentrancyGuard {
 
         // Pay seller and feeAccount
         // Accept BTCS token to purchase NFTs
-        item.ft.transferFrom(msg.sender, item.seller, item.price);
+        item.ft.transferFrom(senderAddress, item.seller, item.price);
         item.ft.transferFrom(
-            msg.sender,
+            senderAddress,
             receivedFeeAccount,
             _totalPrice - item.price
         );
@@ -129,7 +138,7 @@ contract Marketplace is ReentrancyGuard {
         item.sold = true;
 
         // Transfer nft to buyer
-        item.nft.transferFrom(address(this), msg.sender, item.tokenId);
+        item.nft.transferFrom(address(this), senderAddress, item.tokenId);
 
         // Emit Bought event
         emit Bought(
@@ -139,7 +148,7 @@ contract Marketplace is ReentrancyGuard {
             item.tokenId,
             item.price,
             item.seller,
-            msg.sender
+            senderAddress
         );
 
         // Remove _itemId from items mapping
