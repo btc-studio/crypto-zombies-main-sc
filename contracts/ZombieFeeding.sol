@@ -7,13 +7,12 @@ contract ZombieFeeding is ZombieFactory {
     using SafeMath for uint256;
     using SafeMath16 for uint16;
 
-    modifier onlyOwnerOf(uint _zombieId) {
-        require(msg.sender == ownerOf(_zombieId));
+    modifier onlyOwnerOf(uint _zombieId, address senderAddress) {
+        require(senderAddress == ownerOf(_zombieId));
         _;
     }
 
     constructor(address _token) ZombieFactory(_token) {}
-
 
     function _generateDna(
         uint dna1,
@@ -30,8 +29,14 @@ contract ZombieFeeding is ZombieFactory {
     function breedZombie(
         uint _fatherId,
         uint _motherId,
-        string memory _name
-    ) external onlyOwnerOf(_fatherId) onlyOwnerOf(_motherId) {
+        string memory _name,
+        address senderAddress
+    )
+        external
+        onlyOperator
+        onlyOwnerOf(_fatherId, senderAddress)
+        onlyOwnerOf(_motherId, senderAddress)
+    {
         Zombie storage father = zombies[_fatherId];
         Zombie storage mother = zombies[_motherId];
 
@@ -56,6 +61,6 @@ contract ZombieFeeding is ZombieFactory {
         mother.breedCount = mother.breedCount.add(1);
         // Tinh toán DNA Zombie con từ DNA của bố mẹ
         uint newKittyDna = _generateDna(father.dna, mother.dna, _name);
-        _createZombie(_name, newKittyDna, zombieRarity);
+        _createZombie(_name, newKittyDna, zombieRarity, senderAddress);
     }
 }

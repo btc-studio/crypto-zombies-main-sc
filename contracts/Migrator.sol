@@ -17,18 +17,18 @@ contract Migrator is GiftPack {
     // ======================== Implement ========================
     constructor(address _token) GiftPack(_token) {}
 
-    function setFtContract(address _oldFt, address _newFt) public {
+    function setFtContract(address _oldFt, address _newFt) public onlyOwner {
         oldFtContract = ERC20(_oldFt);
         newFtContract = ERC20(_newFt);
         oldFtContractAddress = _oldFt;
         newFtContractAddress = _newFt;
     }
 
-    function setNftContract(address _oldNft) public {
+    function setNftContract(address _oldNft) public onlyOwner {
         oldNftContract = GiftPack(_oldNft);
     }
 
-    function migrateData() public {
+    function migrateData() public onlyOwner {
         require(isMigrated == false, "Already migrated");
         require(msg.sender == oldNftContract.owner(), "OW_SC");
 

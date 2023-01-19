@@ -31,9 +31,12 @@ contract ZombieAttack is ZombieHelper {
 
     constructor(address _token) ZombieHelper(_token) {}
 
-    function findBattle(uint _zombieId) external view returns (uint) {
+    function findBattle(
+        uint _zombieId,
+        address senderAddress
+    ) external view returns (uint) {
         // If there is only 1 address has zombie in the SC -> Return error
-        require(_getNumberZombiesOfOwner(msg.sender) != zombieCount);
+        require(_getNumberZombiesOfOwner(senderAddress) != zombieCount);
 
         // Find Zombie
         uint _targetId = findRandomZombie(_zombieId);
@@ -43,8 +46,9 @@ contract ZombieAttack is ZombieHelper {
 
     function attack(
         uint _zombieId,
-        uint _targetId
-    ) external onlyOwnerOf(_zombieId) {
+        uint _targetId,
+        address senderAddress
+    ) external onlyOperator onlyOwnerOf(_zombieId, senderAddress) {
         Zombie storage myZombie = zombies[_zombieId];
         Zombie storage enemyZombie = zombies[_targetId];
 

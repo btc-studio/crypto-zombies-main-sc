@@ -16,12 +16,15 @@ contract GiftPack is ZombieAttack {
         return seenWalletOpenStarterPack[_address];
     }
 
-    function openStarterPack() external {
-        require(!checkOpenStarterPack(msg.sender));
-        seenWalletOpenStarterPack[msg.sender] = true;
+    function openStarterPack(address senderAddress) external onlyOperator {
+        require(!checkOpenStarterPack(senderAddress));
+        seenWalletOpenStarterPack[senderAddress] = true;
 
-        _createUser(msg.sender);
+        _createUser(senderAddress);
 
-        emit OpenStarterPack(msg.sender, _createManyDnas(STARTER_ZOMBIE_COUNT));
+        emit OpenStarterPack(
+            senderAddress,
+            _createManyDnas(STARTER_ZOMBIE_COUNT, senderAddress)
+        );
     }
 }
